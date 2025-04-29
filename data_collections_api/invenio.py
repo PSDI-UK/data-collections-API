@@ -838,7 +838,7 @@ class _Licenses(_SubCommandHandler):
 class InvenioRepository:
     """Handler for Invenio-like repositories.
 
-    Handles pushing info to e.g. Zenodo
+    Handles pushing info to e.g. Zenodo.
 
     Parameters
     ----------

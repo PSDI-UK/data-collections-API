@@ -561,7 +561,7 @@ class _Repository(_SubCommandHandler):
 class _AllRecords(_SubCommandHandler):
     @property
     def api_url(self):
-        return f"{self.parent.url}/records/"
+        return f"{self.parent.url}/records"
 
     def __getitem__(self, rec_id) -> _Deposition:
         return _Deposition(self, rec_id)
@@ -686,7 +686,7 @@ class InvenioRepository:
     """
 
     def __init__(self, url: str, api_key: str, *, is_zenodo: bool = False):
-        self.url = url
+        self.url = url.strip("/").removesuffix("/api") + "/api/"
         self.api_key = api_key
 
         self.depositions = _Repository(self) if is_zenodo else _AllRecords(self)

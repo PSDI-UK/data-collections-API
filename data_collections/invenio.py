@@ -56,7 +56,7 @@ class _SubCommandHandler(ABC):
 
 class _File(_SubCommandHandler):
     def __init__(self, parent, name):
-        super.__init__(self, parent)
+        super.__init__(parent)
         self.name = name
 
     @property
@@ -207,7 +207,7 @@ class _Files(_SubCommandHandler):
     """Handler for files within a deposition."""
 
     def __init__(self, parent):
-        super.__init__(self, parent)
+        super.__init__(parent)
 
     @property
     def dep_id(self) -> str:
@@ -334,7 +334,7 @@ class _Deposition(_SubCommandHandler):
     """Deposition handler."""
 
     def __init__(self, parent, dep_id):
-        super().__init__(self, parent)
+        super().__init__(parent)
         self.dep_id = dep_id
 
     @property

@@ -1,6 +1,6 @@
 [project]
 name = "data-collections"
-version = "0.1.0"
+# version = "0.1.0"
 description = "API for depositing and retrieving from PSDI data collections repository"
 authors = [
     { name = "Elliott Kasoar" },
@@ -38,7 +38,7 @@ test = ["pytest==8.3.4", "pytest-cov==5.0.0"]
 
 [project.urls]
 Homepage="https://github.com/PSDI-UK/data-collections-API"
-Documentation = ""
+# Documentation = ""
 Repository="https://github.com/PSDI-UK/data-collections-API.git"
 "Bug Tracker" = "https://github.com/PSDI-UK/data-collections-API/issues"
 

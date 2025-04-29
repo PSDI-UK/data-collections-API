@@ -58,7 +58,7 @@ class _SubCommandHandler(ABC):  # noqa: B024 (abstract-base-class-without-abstra
 
 class _File(_SubCommandHandler):
     def __init__(self, parent, name):
-        super.__init__(parent)
+        super().__init__(parent)
         self.name = name
 
     @property
@@ -209,7 +209,7 @@ class _Files(_SubCommandHandler):
     """Handler for files within a deposition."""
 
     def __init__(self, parent):
-        super.__init__(parent)
+        super().__init__(parent)
 
     @property
     def dep_id(self) -> str:

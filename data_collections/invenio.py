@@ -70,7 +70,7 @@ class _File(_SubCommandHandler):
         self.name = name
 
     @property
-    def loc_id(self) -> str:
+    def rec_id(self) -> str:
         """Get parent ID.
 
         Returns
@@ -78,7 +78,7 @@ class _File(_SubCommandHandler):
         str
             parent ID.
         """
-        return self.parent.loc_id
+        return self.parent.rec_id
 
     @property
     def bucket_url(self):
@@ -104,11 +104,11 @@ class _File(_SubCommandHandler):
                 self.api_url,
                 params={**params, "access_token": self.api_key},
             ),
-            f"getting {self.name} file info from deposition {self.loc_id}",
+            f"getting {self.name} file info from record {self.rec_id}",
         )
 
     def update(self, file: Path, **params) -> JSONResponse:
-        """Replace a file on a deposition.
+        """Replace a file on a record.
 
         Parameters
         ----------
@@ -129,11 +129,11 @@ class _File(_SubCommandHandler):
                 data=json.dumps(data),
                 headers=header,
             ),
-            f"updating {self.name} in deposition {self.loc_id}",
+            f"updating {self.name} in record {self.rec_id}",
         )
 
     def download(self, dest: Path = Path(), **params) -> JSONResponse:
-        """Download a file from a deposition.
+        """Download a file from a record.
 
         Parameters
         ----------
@@ -156,7 +156,7 @@ class _File(_SubCommandHandler):
 
         request = _check(
             requests.get(link, params={**params, "access_token": self.api_key}),
-            f"downloading file {self.name} from deposition {self.loc_id}",
+            f"downloading file {self.name} from record {self.rec_id}",
         )
 
         dest = Path(dest)
@@ -172,7 +172,7 @@ class _File(_SubCommandHandler):
         return request
 
     def delete(self, **params) -> JSONResponse:
-        """Delete this file from the deposition.
+        """Delete this file from the record.
 
         Returns
         -------
@@ -184,11 +184,11 @@ class _File(_SubCommandHandler):
                 f"{self.api_url}",
                 params={**params, "access_token": self.api_key},
             ),
-            f"deleting file {self.name} from deposition {self.loc_id}",
+            f"deleting file {self.name} from record {self.rec_id}",
         )
 
     def upload(self, file: Path, **params) -> JSONResponse:
-        """Upload a file to a deposition.
+        """Upload a file to a record.
 
         Parameters
         ----------
@@ -209,12 +209,12 @@ class _File(_SubCommandHandler):
                     params={**params, "access_token": self.api_key},
                     data=in_file,
                 ),
-                f"Uploading file {self.name} to deposition {self.loc_id}",
+                f"Uploading file {self.name} to record {self.rec_id}",
             )
 
 
 class _Files(_SubCommandHandler):
-    """Handler for files within a deposition."""
+    """Handler for files within a record."""
 
     @property
     def api_url(self) -> URL:
@@ -224,15 +224,15 @@ class _Files(_SubCommandHandler):
         super().__init__(parent)
 
     @property
-    def loc_id(self) -> str:
-        """Get deposition ID.
+    def rec_id(self) -> str:
+        """Get record ID.
 
         Returns
         -------
         str
-            Deposition ID.
+            Record ID.
         """
-        return self.parent.loc_id
+        return self.parent.rec_id
 
     @property
     def bucket_url(self) -> str:
@@ -249,7 +249,7 @@ class _Files(_SubCommandHandler):
         return _File(self, name)
 
     def list(self, **params) -> JSONResponse:
-        """Get information about all files in deposition.
+        """Get information about all files in record.
 
         Parameters
         ----------
@@ -266,11 +266,11 @@ class _Files(_SubCommandHandler):
                 self.api_url,
                 params={**params, "access_token": self.api_key},
             ),
-            f"listing deposition {self.loc_id} files",
+            f"listing record {self.rec_id} files",
         )
 
     def sort(self, sorted_ids: dict[str, str], **params) -> JSONResponse:
-        """Re-order files in deposition.
+        """Re-order files in record.
 
         Parameters
         ----------
@@ -289,11 +289,11 @@ class _Files(_SubCommandHandler):
                 data=json.dumps(sorted_ids),
                 headers={"Content-Type": "application/json"},
             ),
-            f"sorting files for deposition {self.loc_id}",
+            f"sorting files for record {self.rec_id}",
         )
 
     def upload(self, files: dict[str, Path], **params) -> JSONResponse:
-        """Upload a set of files to a deposition.
+        """Upload a set of files to a record.
 
         Parameters
         ----------
@@ -318,14 +318,14 @@ class _Files(_SubCommandHandler):
                             params={**params, "access_token": self.api_key},
                             data=curr_file,
                         ),
-                        f"Uploading file {self.name} to deposition {self.loc_id}",
+                        f"Uploading file {self.name} to record {self.rec_id}",
                     ),
                 )
 
         return request_list
 
     def download(self, dest: Path, **params) -> JSONResponse:
-        """Download all files from deposition.
+        """Download all files from record.
 
         Parameters
         ----------
@@ -344,20 +344,20 @@ class _Files(_SubCommandHandler):
             self[file].download(dest, **params)
 
 
-class _Deposition(_SubCommandHandler):
-    """Deposition handler."""
+class _Record(_SubCommandHandler):
+    """Record handler."""
 
     @property
     def api_url(self) -> URL:
-        return f"{self.parent.api_url}/{self.loc_id}"
+        return f"{self.parent.api_url}/{self.rec_id}"
 
-    def __init__(self, parent, loc_id):
+    def __init__(self, parent, rec_id):
         super().__init__(parent)
-        self.loc_id = loc_id
+        self.rec_id = rec_id
 
     @property
     def files(self) -> _Files:
-        """Get files container for this deposition.
+        """Get files container for this record.
 
         Returns
         -------
@@ -378,7 +378,7 @@ class _Deposition(_SubCommandHandler):
         return self.get().json()["links"]["bucket"]
 
     def get(self, **params) -> JSONResponse:
-        """Get information about deposition.
+        """Get information about record.
 
         Returns
         -------
@@ -390,31 +390,13 @@ class _Deposition(_SubCommandHandler):
                 self.api_url,
                 params={**params, "access_token": self.api_key},
             ),
-            f"getting deposition {self.loc_id}",
+            f"getting record {self.rec_id}",
         )
         self.bucket_url = request.json()["links"]["bucket"]
         return request
 
-    def create(self, **params) -> JSONResponse:
-        """Create new empty deposition.
-
-        Returns
-        -------
-        JSONResponse
-            Status of operation.
-        """
-        return _check(
-            requests.post(
-                self.parent.api_url,
-                params={**params, "access_token": self.api_key},
-                json={},
-                headers={"Content-Type": "application/json"},
-            ),
-            "creating deposition",
-        )
-
     def update(self, data: object, **params) -> JSONResponse:
-        """Update deposition information.
+        """Update record information.
 
         Parameters
         ----------
@@ -433,11 +415,11 @@ class _Deposition(_SubCommandHandler):
                 data=json.dumps(data),
                 headers={"Content-Type": "application/json"},
             ),
-            f"updating deposition {self.loc_id}",
+            f"updating record {self.rec_id}",
         )
 
     def delete(self, **params) -> JSONResponse:
-        """Delete deposition.
+        """Delete record.
 
         Returns
         -------
@@ -449,11 +431,11 @@ class _Deposition(_SubCommandHandler):
                 self.api_url,
                 params={**params, "access_token": self.api_key},
             ),
-            f"deleting deposition {self.loc_id}",
+            f"deleting record {self.rec_id}",
         )
 
     def publish(self, **params) -> JSONResponse:
-        """Publish deposition.
+        """Publish record.
 
         Returns
         -------
@@ -465,11 +447,11 @@ class _Deposition(_SubCommandHandler):
                 f"{self.api_url}/actions/publish",
                 params={**params, "access_token": self.api_key},
             ),
-            f"publishing deposition {self.loc_id}",
+            f"publishing record {self.rec_id}",
         )
 
     def edit(self, **params) -> JSONResponse:
-        """Edit deposition details.
+        """Edit record details.
 
         Returns
         -------
@@ -481,11 +463,11 @@ class _Deposition(_SubCommandHandler):
                 f"{self.api_url}/actions/edit",
                 params={**params, "access_token": self.api_key},
             ),
-            f"editing deposition {self.loc_id}",
+            f"editing record {self.rec_id}",
         )
 
     def discard(self, **params) -> JSONResponse:
-        """Discard deposition.
+        """Discard record.
 
         Returns
         -------
@@ -497,11 +479,11 @@ class _Deposition(_SubCommandHandler):
                 f"{self.api_url}/actions/discard",
                 params={**params, "access_token": self.api_key},
             ),
-            f"discarding deposition {self.loc_id}",
+            f"discarding record {self.rec_id}",
         )
 
     def new_version(self, **params) -> JSONResponse:
-        """Push new version of deposition.
+        """Push new version of record.
 
         Returns
         -------
@@ -513,58 +495,17 @@ class _Deposition(_SubCommandHandler):
                 f"{self.api_url}/actions/newversion",
                 params={**params, "access_token": self.api_key},
             ),
-            f"setting new version for deposition {self.loc_id}",
+            f"setting new version for record {self.rec_id}",
         )
 
-
-class _Repository(_SubCommandHandler):
-    @property
-    def api_url(self):
-        return f"{self.parent.url}/deposit/depositions"
-
-    def __getitem__(self, loc_id: str) -> _Deposition:
-        """Get specific deposition in repository (by id).
-
-        Parameters
-        ----------
-        loc_id
-            Depository ID.
-
-        Returns
-        -------
-        _Deposition
-            Deposition for further processing.
-        """
-        return _Deposition(self, loc_id)
-
-    def list(self, **params) -> JSONResponse:
-        """Get information about all depositions on depository.
-
-        Parameters
-        ----------
-        **params
-            Extra params for requests.
-
-        Returns
-        -------
-        JSONResponse
-            Information about operation state.
-        """
-        return _check(
-            requests.get(
-                self.api_url,
-                params={**params, "access_token": self.api_key},
-            ),
-            "listing depositions",
-        )
 
 class _AllRecords(_SubCommandHandler):
     @property
     def api_url(self):
-        return f"{self.parent.url}/records"
+        return f"{self.url}/records"
 
-    def __getitem__(self, rec_id) -> _Deposition:
-        return _Deposition(self, rec_id)
+    def __getitem__(self, rec_id) -> _Record:
+        return _Record(self, rec_id)
 
     def get(self, rec_id, **params) -> JSONResponse:
         """Get information about specific record on depository.
@@ -572,7 +513,7 @@ class _AllRecords(_SubCommandHandler):
         Parameters
         ----------
         rec_id
-            ID of license to look up.
+            ID of record to look up.
         **params
             Extra params for requests.
 
@@ -588,6 +529,25 @@ class _AllRecords(_SubCommandHandler):
             ),
             f"getting record {rec_id}",
         )
+
+    def create(self, **params) -> _Record:
+        """Create new empty record.
+
+        Returns
+        -------
+        JSONResponse
+            Status of operation.
+        """
+        response = _check(
+            requests.post(
+                self.parent.api_url,
+                params={**params, "access_token": self.api_key},
+                json={},
+                headers={"Content-Type": "application/json"},
+            ),
+            "creating record",
+        )
+        return _Record(self, response["id"])
 
     def list(self, **params) -> JSONResponse:
         """Get information about all records on depository.
@@ -609,6 +569,12 @@ class _AllRecords(_SubCommandHandler):
             ),
             "listing records",
         )
+
+
+class _Repository(_AllRecords):
+    @property
+    def api_url(self):
+        return f"{self.parent.url}/deposit/depositions"
 
 
 class _Licenses(_SubCommandHandler):

@@ -25,8 +25,7 @@ keywords = ["psdi", "invenio", "zenodo"]
 dynamic = ["version"]
 
 
-dependencies = [
-]
+dependencies = ["requests"]
 
 [project.optional-dependencies]
 ruamel = ["ruamel.yaml>=0.17.22"]

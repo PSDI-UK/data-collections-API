@@ -520,7 +520,7 @@ class _Deposition(_SubCommandHandler):
 class _Repository(_SubCommandHandler):
     @property
     def api_url(self):
-        return f"{self.url}/deposit/depositions"
+        return f"{self.parent.url}/deposit/depositions"
 
     def __getitem__(self, loc_id: str) -> _Deposition:
         """Get specific deposition in repository (by id).
@@ -561,7 +561,7 @@ class _Repository(_SubCommandHandler):
 class _AllRecords(_SubCommandHandler):
     @property
     def api_url(self):
-        return f"{self.url}/records/"
+        return f"{self.parent.url}/records/"
 
     def __getitem__(self, rec_id) -> _Deposition:
         return _Deposition(self, rec_id)

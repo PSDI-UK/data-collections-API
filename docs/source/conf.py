@@ -6,10 +6,11 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import data_collections
 project = 'Data Collections API'
-copyright = '2025, Jacob Wilkins, Elliott Kasoar, Jas Kalaya, Alin Elena'
-author = 'Jacob Wilkins, Elliott Kasoar, Jas Kalaya, Alin Elena'
-release = '0.1.0'
+author = data_collections.__author__
+copyright = f'2025, {author}'
+release = data_collections.__version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

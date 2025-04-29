@@ -654,6 +654,14 @@ class InvenioRepository:
     """
 
     def __init__(self, url: str, api_key: str):
+        if not (isinstance(url, str)):
+            raise ValueError("`url` must be a string")
+        # Remove trailing /
+        if url[-1] == "/":
+            url = url[:-1]
+        if url[-4:] != "/api":
+            url += "/api"
+
         self.url = url
         self.api_key = api_key
 

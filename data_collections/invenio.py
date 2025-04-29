@@ -1,9 +1,10 @@
 """Repository data structure."""
+
 from __future__ import annotations
 
-import json
 from abc import ABC
 from functools import cached_property
+import json
 from pathlib import Path
 
 import requests
@@ -28,12 +29,13 @@ def _check(request: requests.Request, proc: str):
         request.raise_for_status()
     except requests.HTTPError as err:
         raise requests.HTTPError(
-            f"Error while {proc}, info: {request.json()['message']}"
+            f"Error while {proc}, info: {request.json()['message']}",
         ) from err
 
     return request
 
-class _SubCommandHandler(ABC):
+
+class _SubCommandHandler(ABC):  # noqa: B024 (abstract-base-class-without-abstract-method)
     """Abstract base for general commands.
 
     Parameters
@@ -177,7 +179,6 @@ class _File(_SubCommandHandler):
             f"deleting file {self.name} from deposition {self.dep_id}",
         )
 
-
     def upload(self, file: Path, **params) -> requests.Request:
         """Upload a file to a deposition.
 
@@ -200,8 +201,9 @@ class _File(_SubCommandHandler):
                     params={**params, "access_token": self.api_key},
                     data=in_file,
                 ),
-                f"Uploading file {self.name} to deposition {self.dep_id}"
+                f"Uploading file {self.name} to deposition {self.dep_id}",
             )
+
 
 class _Files(_SubCommandHandler):
     """Handler for files within a deposition."""
@@ -275,7 +277,7 @@ class _Files(_SubCommandHandler):
                 data=json.dumps(sorted_ids),
                 headers={"Content-Type": "application/json"},
             ),
-            f"sorting files for deposition {self.dep_id}"
+            f"sorting files for deposition {self.dep_id}",
         )
 
     def upload(self, files: dict[str, Path], **params) -> requests.Request:
@@ -304,8 +306,8 @@ class _Files(_SubCommandHandler):
                             params={**params, "access_token": self.api_key},
                             data=curr_file,
                         ),
-                        f"Uploading file {self.name} to deposition {self.dep_id}"
-                    )
+                        f"Uploading file {self.name} to deposition {self.dep_id}",
+                    ),
                 )
 
         return request_list
@@ -372,11 +374,10 @@ class _Deposition(_SubCommandHandler):
                 f"{self.url}/deposit/depositions/{self.dep_id}",
                 params={**params, "access_token": self.api_key},
             ),
-            f"getting deposition {self.dep_id}"
+            f"getting deposition {self.dep_id}",
         )
         self.bucket_url = request.json()["links"]["bucket"]
         return request
-
 
     def create(self, **params) -> requests.Request:
         """Create new empty deposition.
@@ -393,7 +394,7 @@ class _Deposition(_SubCommandHandler):
                 json={},
                 headers={"Content-Type": "application/json"},
             ),
-            "creating deposition"
+            "creating deposition",
         )
 
     def update(self, data: object, **params) -> requests.Request:
@@ -416,7 +417,7 @@ class _Deposition(_SubCommandHandler):
                 data=json.dumps(data),
                 headers={"Content-Type": "application/json"},
             ),
-            f"updating deposition {self.dep_id}"
+            f"updating deposition {self.dep_id}",
         )
 
     def delete(self, **params) -> requests.Request:
@@ -432,7 +433,7 @@ class _Deposition(_SubCommandHandler):
                 f"{self.url}/deposit/depositions/{self.dep_id}",
                 params={**params, "access_token": self.api_key},
             ),
-            f"deleting deposition {self.dep_id}"
+            f"deleting deposition {self.dep_id}",
         )
 
     def publish(self, **params) -> requests.Request:
@@ -499,6 +500,7 @@ class _Deposition(_SubCommandHandler):
             f"setting new version for deposition {self.dep_id}",
         )
 
+
 class _Repository(_SubCommandHandler):
     def __getitem__(self, dep_id: str) -> _Deposition:
         """Get specific deposition in repository (by id).
@@ -533,7 +535,7 @@ class _Repository(_SubCommandHandler):
                 f"{self.url}/deposit/depositions",
                 params={**params, "access_token": self.api_key},
             ),
-            "listing depositions"
+            "listing depositions",
         )
 
 
@@ -576,10 +578,12 @@ class _Records(_SubCommandHandler):
         """
         return _check(
             requests.get(
-                f"{self.url}/records", params={**params, "access_token": self.api_key}
+                f"{self.url}/records",
+                params={**params, "access_token": self.api_key},
             ),
             "listing records",
         )
+
 
 class _Licenses(_SubCommandHandler):
     def get(self, lic_id, **params) -> requests.Request:
@@ -620,7 +624,8 @@ class _Licenses(_SubCommandHandler):
         """
         return _check(
             requests.get(
-                f"{self.url}/licenses/", params={**params, "access_token": self.api_key}
+                f"{self.url}/licenses/",
+                params={**params, "access_token": self.api_key},
             ),
             "listing licenses",
         )

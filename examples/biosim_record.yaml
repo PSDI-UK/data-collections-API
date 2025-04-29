@@ -1,0 +1,102 @@
+access:
+  files: public
+  record: public
+custom_fields:
+  dsmd:
+  - atom_count: 198
+    barostat: Parrinello-rahman
+    box_type: cubic
+    ensemble: NPT
+    experimental_structures: https://gpcrdb.org/structure/homology_models/pth2r_human_inactive, https://gpcrdb.org/structure/homology_models/pth2r_human_active
+    force_fields: martini3001
+    framestep: '0.05'
+    length: '0.5'
+    membrane: 'Yes'
+    molecular_model: Coarse-grained
+    pH: 7
+    pressure: 1
+    simulation_method: Classical
+    software: GROMACS
+    software_version: '2022.4'
+    timpestep: 2
+    trajectories: Cartesian coordinates
+files:
+  enabled: true
+metadata:
+  creators:
+  - affiliations:
+    - name: STFC
+    person_or_org:
+      family_name: Kalayan
+      given_name: Jas
+      identifiers:
+      - identifier: 0000-0002-6833-1864
+        scheme: orcid
+      name: Kalayan, Jas
+      type: personal
+  - affiliations:
+    - name: University of Southampton
+    person_or_org:
+      family_name: Chao
+      given_name: Kin
+      name: Chao, Kin
+      type: personal
+  - affiliations:
+    - name: Imperial College London
+    person_or_org:
+      family_name: Rouse
+      given_name: Sarah
+      identifiers:
+      - identifier: 0000-0002-7115-1565
+        scheme: orcid
+      name: Rouse, Sarah
+      type: personal
+  - person_or_org:
+      family_name: Gebbie-Rayet
+      given_name: James
+      identifiers:
+      - identifier: 0000-0001-8271-3431
+        scheme: orcid
+      name: Gebbie-Rayet, James
+      type: personal
+  description: '<p>Example setup of a martini2 coarse-grained molecular dynamics simulation
+    of the active state PTH2R (Parathyroid hormone receptor type 2) protein embedded
+    in a lipid bilayer membrane along with water and counter-ions. Command-line tools
+    provided in <a href="https://aiida-gromacs.readthedocs.io/en/latest/">aiida-gromacs</a>
+    are used to track each step performed on the terminal.</p>
+
+    <p>&nbsp;</p>
+
+    <h3>The data:</h3>
+
+    <p>The files in this record are:</p>
+
+    <p>1144.dot.pdf: The image of the graph
+    representation for the simulation workflow.</p>
+
+    <p>gpcr_all_steps.aiida: The aiida
+    archive file where all simulation setup steps performed in this work are packaged.</p>
+
+    <p>&nbsp;</p>
+
+    <p>The stripped trajectory for the active and inactive states of PTH2R are in
+    the following files:</p>
+
+    <p>R1a.pdb and R1a.xtc: pdb and trajectory of coordinates
+    for the active state protein.</p>
+
+    <p>R1i.pdb and R1i.xtc pdb and trajectory of coordinates
+    for the inactive state protein.</p>'
+  identifiers:
+  - identifier: https://doi.org/10.1101/2024.12.19.629375
+  publication_date: '2025-02-28'
+  publisher: PSDI
+  resource_type:
+    id: model
+  rights:
+  - id: cc-by-4.0
+  subjects:
+  - subject: Biomolecular Simulation
+  - subject: Molecular Dynamics
+  title: Coarse-grained MD simulation provenance of membrane embedded GPCR using GROMACS and aiida-gromacs
+  version: v1

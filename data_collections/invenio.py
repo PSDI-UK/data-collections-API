@@ -672,6 +672,8 @@ class InvenioRepository:
         Repository URL.
     api_key : str
         API key with appropriate permissions.
+    is_zenodo : bool
+        Whether to use `deposition` interface or `records` interface.
 
     Examples
     --------

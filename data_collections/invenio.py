@@ -255,7 +255,7 @@ class _Files(_SubCommandHandler):
                 params={**params, "access_token": self.api_key},
             ),
             f"listing deposition {self.dep_id} files",
-        )
+        ).json()
 
     def sort(self, sorted_ids: dict[str, str], **params) -> requests.Request:
         """Re-order files in deposition.
@@ -536,7 +536,7 @@ class _Repository(_SubCommandHandler):
                 params={**params, "access_token": self.api_key},
             ),
             "listing depositions",
-        )
+        ).json()
 
 
 class _Records(_SubCommandHandler):
@@ -582,7 +582,7 @@ class _Records(_SubCommandHandler):
                 params={**params, "access_token": self.api_key},
             ),
             "listing records",
-        )
+        ).json()
 
 
 class _Licenses(_SubCommandHandler):
@@ -628,7 +628,7 @@ class _Licenses(_SubCommandHandler):
                 params={**params, "access_token": self.api_key},
             ),
             "listing licenses",
-        )
+        ).json()
 
 
 class InvenioRepository:

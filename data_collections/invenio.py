@@ -344,6 +344,113 @@ class _Files(_SubCommandHandler):
             self[file].download(dest, **params)
 
 
+class _Draft(_SubCommandHandler):
+    """Record handler."""
+
+    @property
+    def api_url(self) -> URL:
+        return f"{self.parent.url}/records/{self.rec_id}/draft"
+
+    def __init__(self, parent, rec_id):
+        super().__init__(parent)
+        self.rec_id = rec_id
+
+    @property
+    def files(self) -> _Files:
+        """Get files container for this record.
+
+        Returns
+        -------
+        _Files
+            File handler.
+        """
+        return _Files(self)
+
+    @cached_property
+    def bucket_url(self):
+        """Get URL for new API file bucket.
+
+        Returns
+        -------
+        str
+            File bucket to ``put`` files.
+        """
+        return self.get()
+
+    def get(self, **params) -> JSONResponse:
+        """Get information about record.
+
+        Returns
+        -------
+        JSONResponse
+            Status of operation.
+        """
+        request = _check(
+            requests.get(
+                f"{self.parent.url}/records/{self.rec_id}/draft",
+                params={**params, "access_token": self.api_key},
+            ),
+            f"getting record {self.rec_id}",
+        )
+        self.bucket_url = request
+        return request
+
+    def update(self, data: object, **params) -> JSONResponse:
+        """Update record information.
+
+        Parameters
+        ----------
+        data
+            Data to be json dumped.
+
+        Returns
+        -------
+        JSONResponse
+            Status of operation.
+        """
+        return _check(
+            requests.put(
+                f"{self.parent.url}/records/{self.rec_id}/draft",
+                params={**params, "access_token": self.api_key},
+                data=json.dumps(data),
+                headers={"Content-Type": "application/json"},
+            ),
+            f"updating record {self.rec_id}",
+        )
+
+    def delete(self, **params) -> JSONResponse:
+        """Delete record.
+
+        Returns
+        -------
+        JSONResponse
+            Status of operation.
+        """
+        return _check(
+            requests.delete(
+                f"{self.parent.url}/records/{self.rec_id}/draft",
+                params={**params, "access_token": self.api_key},
+            ),
+            f"deleting record {self.rec_id}",
+        )
+
+    def publish(self, **params) -> JSONResponse:
+        """Publish record.
+
+        Returns
+        -------
+        JSONResponse
+            Status of operation.
+        """
+        return _check(
+            requests.post(
+                f"{self.parent.url}/records/{self.rec_id}/draft/actions/publish",
+                params={**params, "access_token": self.api_key},
+            ),
+            f"publishing record {self.rec_id}",
+        )
+
+
 class _Record(_SubCommandHandler):
     """Record handler."""
 
@@ -375,7 +482,7 @@ class _Record(_SubCommandHandler):
         str
             File bucket to ``put`` files.
         """
-        return self.get().json()["links"]["bucket"]
+        return self.get()["links"]["self"] #["bucket"]
 
     def get(self, **params) -> JSONResponse:
         """Get information about record.
@@ -392,7 +499,7 @@ class _Record(_SubCommandHandler):
             ),
             f"getting record {self.rec_id}",
         )
-        self.bucket_url = request.json()["links"]["bucket"]
+        self.bucket_url = request["links"]["self"] #["bucket"]
         return request
 
     def update(self, data: object, **params) -> JSONResponse:
@@ -452,6 +559,7 @@ class _Record(_SubCommandHandler):
 
     def edit(self, **params) -> JSONResponse:
         """Edit record details.
+        Edit a published record (Create a draft record from a published record)
 
         Returns
         -------
@@ -460,7 +568,7 @@ class _Record(_SubCommandHandler):
         """
         return _check(
             requests.post(
-                f"{self.api_url}/actions/edit",
+                f"{self.parent.url}/records/{self.rec_id}/draft",
                 params={**params, "access_token": self.api_key},
             ),
             f"editing record {self.rec_id}",
@@ -529,8 +637,32 @@ class _AllRecords(_SubCommandHandler):
             ),
             f"getting record {rec_id}",
         )
+    
+    def draft(self, rec_id, **params) -> _Draft:
+        """Get information about specific record on depository.
 
-    def create(self, **params) -> _Record:
+        Parameters
+        ----------
+        rec_id
+            ID of record to look up.
+        **params
+            Extra params for requests.
+
+        Returns
+        -------
+        JSONResponse
+            Information about operation state.
+        """
+        response =  _check(
+            requests.get(
+                f"{self.api_url}/{rec_id}/draft",
+                params={**params, "access_token": self.api_key},
+            ),
+            f"getting record {rec_id}",
+        )
+        return _Draft(self, response["id"])
+
+    def create(self, **params) -> _Draft:
         """Create new empty record.
 
         Returns
@@ -540,14 +672,14 @@ class _AllRecords(_SubCommandHandler):
         """
         response = _check(
             requests.post(
-                self.parent.api_url,
+                f"{self.url}/records",
                 params={**params, "access_token": self.api_key},
                 json={},
                 headers={"Content-Type": "application/json"},
             ),
             "creating record",
         )
-        return _Record(self, response["id"])
+        return _Draft(self, response["id"])
 
     def list(self, **params) -> JSONResponse:
         """Get information about all records on depository.
@@ -652,7 +784,7 @@ class InvenioRepository:
     """
 
     def __init__(self, url: str, api_key: str, *, is_zenodo: bool = False):
-        self.url = url.strip("/").removesuffix("/api") + "/api/"
+        self.url = url.strip("/").removesuffix("/api") + "/api"
         self.api_key = api_key
 
         self.depositions = _Repository(self) if is_zenodo else _AllRecords(self)

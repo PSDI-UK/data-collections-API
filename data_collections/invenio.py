@@ -345,7 +345,7 @@ class _Files(_SubCommandHandler):
 
 
 class _Draft(_SubCommandHandler):
-    """Record handler."""
+    """Draft handler."""
 
     @property
     def api_url(self) -> URL:
@@ -378,7 +378,7 @@ class _Draft(_SubCommandHandler):
         return self.get()
 
     def get(self, **params) -> JSONResponse:
-        """Get information about record.
+        """Get information about draft record.
 
         Returns
         -------
@@ -396,7 +396,7 @@ class _Draft(_SubCommandHandler):
         return request
 
     def update(self, data: object, **params) -> JSONResponse:
-        """Update record information.
+        """Update draft record information.
 
         Parameters
         ----------
@@ -419,7 +419,7 @@ class _Draft(_SubCommandHandler):
         )
 
     def delete(self, **params) -> JSONResponse:
-        """Delete record.
+        """Delete draft record.
 
         Returns
         -------
@@ -435,7 +435,7 @@ class _Draft(_SubCommandHandler):
         )
 
     def publish(self, **params) -> JSONResponse:
-        """Publish record.
+        """Publish draft record.
 
         Returns
         -------

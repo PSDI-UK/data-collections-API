@@ -13,6 +13,8 @@ import requests
 URL = NewType("URL", str)
 JSONResponse = NewType("JSONResponse", dict)
 
+import sys
+
 
 def _check(request: requests.Request, proc: str) -> dict:
     """Verify that a request has succeeded.
@@ -310,15 +312,40 @@ class _Files(_SubCommandHandler):
         for name, file in files.items():
             file = Path(file)
 
+            request_list.append(
+                _check(
+                requests.post(
+                    f"{self.url}/records/{self.rec_id}/draft/files",
+                    params={**params, "access_token": self.api_key},
+                    data=json.dumps([{"key": name}]),
+                    headers={"Content-Type": "application/json"},
+
+                ),
+                f"starting draft file upload for record {self.rec_id}",
+                ),
+            )
+
             with file.open("rb") as curr_file:
                 request_list.append(
                     _check(
                         requests.put(
-                            f"{self.bucket_url}/{name}",
+                            f"{self.url}/records/{self.rec_id}/draft/files/{name}/content",
                             params={**params, "access_token": self.api_key},
                             data=curr_file,
+                            headers={"Content-Type": "application/octet-stream"},
                         ),
-                        f"Uploading file {self.name} to record {self.rec_id}",
+                        f"Uploading file {name} content to record {self.rec_id}",
+                    ),
+                )
+
+                request_list.append(
+                    _check(
+                        requests.post(
+                            f"{self.url}/records/{self.rec_id}/draft/files/{name}/commit",
+                            params={**params, "access_token": self.api_key},
+                            headers={"Content-Type": "application/application/json"},
+                        ),
+                        f"Committing file {name} to record {self.rec_id}",
                     ),
                 )
 
@@ -433,6 +460,43 @@ class _Draft(_SubCommandHandler):
             ),
             f"deleting record {self.rec_id}",
         )
+    
+    
+    def bind(self, community_slug: str, **params) -> JSONResponse:
+        """Bind a draft record to a community
+
+        Parameters
+        ----------
+        community_slug
+            Name of the community to bind the draft record to.
+
+        Returns
+        -------
+        JSONResponse
+            Status of operation.
+        """
+
+        response = _check(
+            requests.get(
+                f"{self.url}/communities/{community_slug}"
+                ),
+                f"getting the ID for {community_slug} community",
+            )
+        community_id = response["id"]
+
+        return _check(
+            requests.put(
+                f"{self.url}/records/{self.rec_id}/draft/review",
+                params={**params, "access_token": self.api_key},
+                json={
+                    "receiver": {
+                        "community": f"{community_id}"
+                    },
+                    "type": "community-submission"
+                },
+            ),
+            f"binding draft record {self.rec_id} to community {community_slug} with ID {community_id}",
+            ),
 
     def publish(self, **params) -> JSONResponse:
         """Publish draft record.

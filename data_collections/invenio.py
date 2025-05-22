@@ -311,11 +311,10 @@ class _Files(_SubCommandHandler):
         request_list = []
         for name, file in files.items():
             file = Path(file)
-
             request_list.append(
                 _check(
                 requests.post(
-                    f"{self.url}/records/{self.rec_id}/draft/files",
+                    self.api_url,
                     params={**params, "access_token": self.api_key},
                     data=json.dumps([{"key": name}]),
                     headers={"Content-Type": "application/json"},
@@ -329,23 +328,23 @@ class _Files(_SubCommandHandler):
                 request_list.append(
                     _check(
                         requests.put(
-                            f"{self.url}/records/{self.rec_id}/draft/files/{name}/content",
+                            f"{self.api_url}/{name}/content",
                             params={**params, "access_token": self.api_key},
                             data=curr_file,
                             headers={"Content-Type": "application/octet-stream"},
                         ),
-                        f"Uploading file {name} content to record {self.rec_id}",
+                        f"uploading file {name} content to record {self.rec_id}",
                     ),
                 )
 
                 request_list.append(
                     _check(
                         requests.post(
-                            f"{self.url}/records/{self.rec_id}/draft/files/{name}/commit",
+                            f"{self.api_url}/{name}/commit",
                             params={**params, "access_token": self.api_key},
                             headers={"Content-Type": "application/application/json"},
                         ),
-                        f"Committing file {name} to record {self.rec_id}",
+                        f"committing file {name} to record {self.rec_id}",
                     ),
                 )
 

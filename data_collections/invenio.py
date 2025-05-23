@@ -152,26 +152,23 @@ class _File(_SubCommandHandler):
         OSError
             If destination exists and is not a directory.
         """
-        info = self.info().json()
-        link = info["links"]["download"]
-        filename = info["filename"]
+        info = self.info()
+        link = info["links"]["self"]
+        filename = info["key"]
 
-        request = _check(
-            requests.get(link, params={**params, "access_token": self.api_key}),
-            f"downloading file {self.name} from record {self.rec_id}",
-        )
+        request = requests.get(link, params={**params, "access_token": self.api_key})
 
         dest = Path(dest)
         if dest.is_file():
             raise OSError(f"{dest} is a file which exists. Must be a directory.")
 
-        if not dest.isdir():
+        if not dest.is_dir():
             dest.mkdir(parents=True, exist_ok=True)
 
         with (dest / filename).open("wb") as out_file:
             out_file.write(request.content)
 
-        return request
+        return _check(request, f"downloading file {self.name} from record {self.rec_id}")
 
     def delete(self, **params) -> JSONResponse:
         """Delete this file from the record.

@@ -70,7 +70,7 @@ class _File(_SubCommandHandler):
         self.name = name
 
     @property
-    def rec_id(self) -> str:
+    def obj_id(self) -> str:
         """Get parent ID.
 
         Returns
@@ -78,10 +78,10 @@ class _File(_SubCommandHandler):
         str
             parent ID.
         """
-        return self.parent.rec_id
+        return self.parent.obj_id
 
     @property
-    def bucket_url(self):
+    def datastore_url(self):
         """Get URL for new API file bucket.
 
         Returns
@@ -89,7 +89,7 @@ class _File(_SubCommandHandler):
         str
             File bucket to ``put`` files.
         """
-        return self.parent.bucket_url
+        return self.parent.datastore_url
 
     def info(self, **params) -> JSONResponse:
         """Get information on a file.
@@ -104,7 +104,7 @@ class _File(_SubCommandHandler):
                 self.api_url,
                 params={**params, "access_token": self.api_key},
             ),
-            f"getting {self.name} file info from record {self.rec_id}",
+            f"getting {self.name} file info from record {self.obj_id}",
         )
 
     def update(self, file: Path, **params) -> JSONResponse:
@@ -129,7 +129,7 @@ class _File(_SubCommandHandler):
                 data=json.dumps(data),
                 headers=header,
             ),
-            f"updating {self.name} in record {self.rec_id}",
+            f"updating {self.name} in record {self.obj_id}",
         )
 
     def download(self, dest: Path = Path(), **params) -> JSONResponse:
@@ -156,7 +156,7 @@ class _File(_SubCommandHandler):
 
         request = _check(
             requests.get(link, params={**params, "access_token": self.api_key}),
-            f"downloading file {self.name} from record {self.rec_id}",
+            f"downloading file {self.name} from record {self.obj_id}",
         )
 
         dest = Path(dest)
@@ -184,7 +184,7 @@ class _File(_SubCommandHandler):
                 f"{self.api_url}",
                 params={**params, "access_token": self.api_key},
             ),
-            f"deleting file {self.name} from record {self.rec_id}",
+            f"deleting file {self.name} from record {self.obj_id}",
         )
 
     def upload(self, file: Path, **params) -> JSONResponse:
@@ -205,11 +205,11 @@ class _File(_SubCommandHandler):
         with file.open("rb") as in_file:
             return _check(
                 requests.put(
-                    f"{self.bucket_url}/{self.name}",
+                    f"{self.datastore_url}/{self.name}",
                     params={**params, "access_token": self.api_key},
                     data=in_file,
                 ),
-                f"Uploading file {self.name} to record {self.rec_id}",
+                f"Uploading file {self.name} to record {self.obj_id}",
             )
 
 
@@ -224,7 +224,7 @@ class _Files(_SubCommandHandler):
         super().__init__(parent)
 
     @property
-    def rec_id(self) -> str:
+    def obj_id(self) -> str:
         """Get record ID.
 
         Returns
@@ -232,10 +232,10 @@ class _Files(_SubCommandHandler):
         str
             Record ID.
         """
-        return self.parent.rec_id
+        return self.parent.obj_id
 
     @property
-    def bucket_url(self) -> str:
+    def datastore_url(self) -> str:
         """Get URL for new API file bucket.
 
         Returns
@@ -243,7 +243,7 @@ class _Files(_SubCommandHandler):
         str
             File bucket to ``put`` files.
         """
-        return self.parent.bucket_url
+        return self.parent.datastore_url
 
     def __getitem__(self, name) -> _File:
         return _File(self, name)
@@ -266,7 +266,7 @@ class _Files(_SubCommandHandler):
                 self.api_url,
                 params={**params, "access_token": self.api_key},
             ),
-            f"listing record {self.rec_id} files",
+            f"listing record {self.obj_id} files",
         )
 
     def sort(self, sorted_ids: dict[str, str], **params) -> JSONResponse:
@@ -289,7 +289,7 @@ class _Files(_SubCommandHandler):
                 data=json.dumps(sorted_ids),
                 headers={"Content-Type": "application/json"},
             ),
-            f"sorting files for record {self.rec_id}",
+            f"sorting files for record {self.obj_id}",
         )
 
     def upload(self, files: dict[str, Path], **params) -> JSONResponse:
@@ -314,11 +314,11 @@ class _Files(_SubCommandHandler):
                 request_list.append(
                     _check(
                         requests.put(
-                            f"{self.bucket_url}/{name}",
+                            f"{self.datastore_url}/{name}",
                             params={**params, "access_token": self.api_key},
                             data=curr_file,
                         ),
-                        f"Uploading file {self.name} to record {self.rec_id}",
+                        f"Uploading file {self.name} to record {self.obj_id}",
                     ),
                 )
 
@@ -349,11 +349,11 @@ class _Record(_SubCommandHandler):
 
     @property
     def api_url(self) -> URL:
-        return f"{self.parent.api_url}/{self.rec_id}"
+        return f"{self.parent.api_url}/{self.obj_id}"
 
-    def __init__(self, parent, rec_id):
+    def __init__(self, parent, obj_id):
         super().__init__(parent)
-        self.rec_id = rec_id
+        self.obj_id = obj_id
 
     @property
     def files(self) -> _Files:
@@ -367,7 +367,7 @@ class _Record(_SubCommandHandler):
         return _Files(self)
 
     @cached_property
-    def bucket_url(self):
+    def datastore_url(self):
         """Get URL for new API file bucket.
 
         Returns
@@ -375,7 +375,7 @@ class _Record(_SubCommandHandler):
         str
             File bucket to ``put`` files.
         """
-        return self.get().json()["links"]["bucket"]
+        return self.get().json()["links"]["self"]
 
     def get(self, **params) -> JSONResponse:
         """Get information about record.
@@ -390,9 +390,9 @@ class _Record(_SubCommandHandler):
                 self.api_url,
                 params={**params, "access_token": self.api_key},
             ),
-            f"getting record {self.rec_id}",
+            f"getting record {self.obj_id}",
         )
-        self.bucket_url = request.json()["links"]["bucket"]
+        self.datastore_url = request.json()["links"]["self"]
         return request
 
     def update(self, data: object, **params) -> JSONResponse:
@@ -415,7 +415,7 @@ class _Record(_SubCommandHandler):
                 data=json.dumps(data),
                 headers={"Content-Type": "application/json"},
             ),
-            f"updating record {self.rec_id}",
+            f"updating record {self.obj_id}",
         )
 
     def delete(self, **params) -> JSONResponse:
@@ -431,7 +431,7 @@ class _Record(_SubCommandHandler):
                 self.api_url,
                 params={**params, "access_token": self.api_key},
             ),
-            f"deleting record {self.rec_id}",
+            f"deleting record {self.obj_id}",
         )
 
     def publish(self, **params) -> JSONResponse:
@@ -447,7 +447,7 @@ class _Record(_SubCommandHandler):
                 f"{self.api_url}/actions/publish",
                 params={**params, "access_token": self.api_key},
             ),
-            f"publishing record {self.rec_id}",
+            f"publishing record {self.obj_id}",
         )
 
     def edit(self, **params) -> JSONResponse:
@@ -463,7 +463,7 @@ class _Record(_SubCommandHandler):
                 f"{self.api_url}/actions/edit",
                 params={**params, "access_token": self.api_key},
             ),
-            f"editing record {self.rec_id}",
+            f"editing record {self.obj_id}",
         )
 
     def discard(self, **params) -> JSONResponse:
@@ -479,7 +479,7 @@ class _Record(_SubCommandHandler):
                 f"{self.api_url}/actions/discard",
                 params={**params, "access_token": self.api_key},
             ),
-            f"discarding record {self.rec_id}",
+            f"discarding record {self.obj_id}",
         )
 
     def new_version(self, **params) -> JSONResponse:
@@ -495,7 +495,7 @@ class _Record(_SubCommandHandler):
                 f"{self.api_url}/actions/newversion",
                 params={**params, "access_token": self.api_key},
             ),
-            f"setting new version for record {self.rec_id}",
+            f"setting new version for record {self.obj_id}",
         )
 
 
@@ -504,15 +504,15 @@ class _AllRecords(_SubCommandHandler):
     def api_url(self):
         return f"{self.url}/records"
 
-    def __getitem__(self, rec_id) -> _Record:
-        return _Record(self, rec_id)
+    def __getitem__(self, obj_id) -> _Record:
+        return _Record(self, obj_id)
 
-    def get(self, rec_id, **params) -> JSONResponse:
+    def get(self, obj_id, **params) -> JSONResponse:
         """Get information about specific record on depository.
 
         Parameters
         ----------
-        rec_id
+        obj_id
             ID of record to look up.
         **params
             Extra params for requests.
@@ -524,10 +524,10 @@ class _AllRecords(_SubCommandHandler):
         """
         return _check(
             requests.get(
-                f"{self.api_url}/{rec_id}",
+                f"{self.api_url}/{obj_id}",
                 params={**params, "access_token": self.api_key},
             ),
-            f"getting record {rec_id}",
+            f"getting record {obj_id}",
         )
 
     def create(self, **params) -> _Record:
@@ -652,7 +652,7 @@ class InvenioRepository:
     """
 
     def __init__(self, url: str, api_key: str, *, is_zenodo: bool = False):
-        self.url = url.strip("/").removesuffix("/api") + "/api/"
+        self.url = url.strip("/").removesuffix("/api") + "/api"
         self.api_key = api_key
 
         self.depositions = _Repository(self) if is_zenodo else _AllRecords(self)

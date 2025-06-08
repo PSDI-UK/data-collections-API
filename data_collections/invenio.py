@@ -13,8 +13,6 @@ import requests
 URL = NewType("URL", str)
 JSONResponse = NewType("JSONResponse", dict)
 
-import sys
-
 
 def _check(request: requests.Request, proc: str) -> dict:
     """Verify that a request has succeeded.

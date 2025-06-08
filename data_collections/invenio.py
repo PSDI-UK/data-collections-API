@@ -156,7 +156,7 @@ class _File(_SubCommandHandler):
         link = info["links"]["self"]
         filename = info["key"]
 
-        request = requests.get(link, params={**params, "access_token": self.api_key})
+        request = requests.get(f"{link}/content", params={**params, "access_token": self.api_key})
 
         dest = Path(dest)
         if dest.is_file():
@@ -182,6 +182,9 @@ class _File(_SubCommandHandler):
             requests.delete(
                 f"{self.api_url}",
                 params={**params, "access_token": self.api_key},
+                headers={
+                    "Content-Type": "application/json"
+                },
             ),
             f"deleting file {self.name} from record {self.rec_id}",
         )
@@ -339,7 +342,6 @@ class _Files(_SubCommandHandler):
                         requests.post(
                             f"{self.api_url}/{name}/commit",
                             params={**params, "access_token": self.api_key},
-                            headers={"Content-Type": "application/application/json"},
                         ),
                         f"committing file {name} to record {self.rec_id}",
                     ),
@@ -482,7 +484,7 @@ class _Draft(_SubCommandHandler):
 
         return _check(
             requests.put(
-                f"{self.url}/records/{self.rec_id}/draft/review",
+                f"{self.api_url}/review",
                 params={**params, "access_token": self.api_key},
                 json={
                     "receiver": {
@@ -504,10 +506,26 @@ class _Draft(_SubCommandHandler):
         """
         return _check(
             requests.post(
-                f"{self.parent.url}/records/{self.rec_id}/draft/actions/publish",
+                f"{self.api_url}/actions/publish",
                 params={**params, "access_token": self.api_key},
             ),
             f"publishing record {self.rec_id}",
+        )
+    
+    def submit_review(self, **params) -> JSONResponse:
+        """Submit draft record for review.
+
+        Returns
+        -------
+        JSONResponse
+            Status of operation.
+        """
+        return _check(
+            requests.post(
+                f"{self.api_url}/actions/submit-review",
+                params={**params, "access_token": self.api_key},
+            ),
+            f"submitting for review record {self.rec_id}",
         )
 
 

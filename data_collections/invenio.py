@@ -380,7 +380,7 @@ class _Draft(_SubCommandHandler):
 
     @property
     def files(self) -> _Files:
-        """Get files container for this record.
+        """Get files container for this draft record.
 
         Returns
         -------

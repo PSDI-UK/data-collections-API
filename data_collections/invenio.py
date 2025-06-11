@@ -236,12 +236,12 @@ class _Files(_SubCommandHandler):
 
     @property
     def datastore_url(self) -> str:
-        """Get URL for new API file bucket.
+        """Get URL for new API file datastore.
 
         Returns
         -------
         str
-            File bucket to ``put`` files.
+            File datastore to ``put`` files.
         """
         return self.parent.datastore_url
 
@@ -368,12 +368,12 @@ class _Record(_SubCommandHandler):
 
     @cached_property
     def datastore_url(self):
-        """Get URL for new API file bucket.
+        """Get URL for new API file datastore.
 
         Returns
         -------
         str
-            File bucket to ``put`` files.
+            File datastore to ``put`` files.
         """
         return self.get().json()["links"]["self"]
 

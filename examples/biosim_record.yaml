@@ -13,12 +13,12 @@ custom_fields:
     length: '0.5'
     membrane: 'Yes'
     molecular_model: Coarse-grained
-    pH: 7
-    pressure: 1
+    pH: '7'
+    pressure: '1'
     simulation_method: Classical
     software: GROMACS
     software_version: '2022.4'
-    timpestep: 2
+    timestep: '2'
     trajectories: Cartesian coordinates
 files:
   enabled: true

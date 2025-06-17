@@ -726,8 +726,8 @@ class _AllRecords(_SubCommandHandler):
 
         Returns
         -------
-        JSONResponse
-            Information about operation state.
+        _Draft
+            Draft record handler.
         """
         response =  _check(
             requests.get(

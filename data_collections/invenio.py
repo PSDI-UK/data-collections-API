@@ -715,7 +715,7 @@ class _AllRecords(_SubCommandHandler):
         )
     
     def draft(self, rec_id, **params) -> _Draft:
-        """Get information about specific record on depository.
+        """Get draft file handler for this record.
 
         Parameters
         ----------

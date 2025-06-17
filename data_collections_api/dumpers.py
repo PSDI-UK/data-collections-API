@@ -139,15 +139,11 @@ def pyyaml_loader(path: Path | str) -> dict[str, Any]:
     FIXME: Add docs.
 
     """
-    try:
-        loader = yaml.CLoader
-    except Exception:
-        loader = yaml.Loader
 
     path = Path(path)
 
     with path.open("r", encoding="utf8") as file:
-        return yaml.safe_load(file, Loader=loader)
+        return yaml.safe_load(file)
 
 
 def json_str_loader(data: str) -> dict[str, Any]:

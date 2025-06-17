@@ -1,6 +1,9 @@
 """Parsing schema for metadata."""
+
+from __future__ import annotations
+
 from datetime import date
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 from uuid import UUID
 
 from schema import And, Optional, Or, Regex, Schema, Use
@@ -13,16 +16,18 @@ id_schema = Or(
         "identifier": Regex(ORCID_ID_RE),
     },
     {
-        "identifier": And(Use(urlparse), lambda x: x.scheme and x.netloc),
+        "identifier": And(Use(urlparse), lambda x: x.scheme and x.netloc, Use(urlunparse)),
         Optional("scheme", default="doi"): "doi",
     },
 )
 
 creator_schema = Schema(
     {
-        Optional("affiliations"): [{
-            "name": str,
-        }],
+        Optional("affiliations"): [
+            {
+                "name": str,
+            }
+        ],
         "person_or_org": {
             Or("name", "family_name"): And(str, len),
             Optional("given_name"): And(str, len),
@@ -38,9 +43,11 @@ metadata_schema = Schema(
         "title": And(str, len),
         "description": And(str, len),
         "creators": [creator_schema],
-        "rights": [{
-            "id": Or("cc-by-4.0"),
-        }],
+        "rights": [
+            {
+                "id": Or("cc-by-4.0"),
+            }
+        ],
         "resource_type": {
             "id": Or("model"),
         },
@@ -66,6 +73,6 @@ schema = Schema(
         Optional("files"): {"enabled": bool},
         "custom_fields": {"dsmd": [dict]},
         "metadata": metadata_schema,
-        "community": UUID,
+        Optional("community"): UUID,
     },
 )

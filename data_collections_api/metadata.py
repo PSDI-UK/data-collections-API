@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 from functools import singledispatch
 from pathlib import Path
 
@@ -10,7 +11,9 @@ from .schema import schema
 
 EXAMPLES_FOLDER = Path(__file__).parent.parent / "examples"
 
-def dump_example(out_file: Path, fmt: Formats):
+
+@singledispatch
+def dump_example(out_file: Path, fmt: Formats | None = None):
     """Dump an example schema.
 
     Parameters
@@ -19,13 +22,24 @@ def dump_example(out_file: Path, fmt: Formats):
         File to write to.
     fmt : Formats
         Format to dump as.
-
-    Examples
-    --------
-    FIXME: Add docs.
     """
-    test = validate_metadata(EXAMPLES_FOLDER / "bare_example.yaml")
-    get_dumper(fmt)(test, out_file)
+    if fmt is None:
+        match out_file.suffix:
+            case ".json":
+                fmt = "json"
+            case ".yaml" | ".yml":
+                fmt = "yaml"
+            case _:
+                raise NotImplementedError(f"Cannot infer type of file {out_file.suffix!r}")
+
+    test = validate_metadata(EXAMPLES_FOLDER / "bare_example.yml")
+    with out_file.open("w", encoding="utf8") as file:
+        get_dumper(fmt)(test, file)
+
+
+@dump_example.register(argparse.Namespace)
+def _(args: argparse.Namespace):
+    dump_example(args.file, args.format)
 
 
 @singledispatch
@@ -41,9 +55,11 @@ def validate_metadata(_val, fmt: Formats | None = None):
     """
     raise NotImplementedError(f"Cannot validate data as {type(_val).__name__}")
 
+
 @validate_metadata.register(dict)
 def _(data: dict):
     return schema.validate(data)
+
 
 @validate_metadata.register(str)
 def _(data: str, fmt: Formats):
@@ -55,6 +71,7 @@ def _(data: str, fmt: Formats):
     else:
         return schema.validate(data)
 
+
 @validate_metadata.register(Path)
 def _(path: Path, fmt: Formats | None = None):
     if fmt is None:
@@ -63,14 +80,13 @@ def _(path: Path, fmt: Formats | None = None):
                 fmt = "json"
             case ".yaml" | ".yml":
                 fmt = "yaml"
+            case _:
+                raise NotImplementedError(f"Cannot infer type of file {path.suffix!r}")
 
     data = get_loader(fmt)(path)
     return schema.validate(data)
 
 
-if __name__ == "__main__":
-    from pprint import pprint
-    test = validate_metadata(EXAMPLES_FOLDER / "biosim_record.yaml")
-    pprint(schema.validate(test))
-    test = validate_metadata(EXAMPLES_FOLDER / "bare_example.yaml")
-    pprint(schema.validate(test))
+@validate_metadata.register(argparse.Namespace)
+def _(inp: argparse.Namespace):
+    return validate_metadata(inp.file, inp.format)

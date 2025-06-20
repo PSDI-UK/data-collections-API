@@ -1,15 +1,17 @@
 #!/usr/bin/env python
-"""
-Script for uploading a record to an Invenio repository
-"""
+"""Script for uploading a record to an Invenio repository."""
 
-from data_collections.invenio import InvenioRepository
+from __future__ import annotations
+
 import argparse
 import logging
-import yaml
 from pathlib import Path
 import sys
-import glob
+
+import yaml
+
+from data_collections.invenio import InvenioRepository
+
 
 def create_files_dict(all_files: list):
     """
@@ -29,7 +31,7 @@ def create_files_dict(all_files: list):
     files_dict = {}
     for file_str in all_files:
         # expand file_str if using wildcards
-        files = glob.glob(file_str)
+        files = Path.glob(file_str)
         for file in files:
             file_path = Path(file)
             files_dict[file_path.name] = file_path
@@ -43,15 +45,12 @@ def run_record_upload(
     files="files",
     community="community",
 ):
-    """
-    Run the uploading of metadata and associated files to an Invenio repository
-    """
-
+    """Run the uploading of metadata and associated files to an Invenio repository."""
     # create repo object
     repository = InvenioRepository(url=api_url, api_key=api_key)
 
     # open metadata record
-    with open(metadata_path) as f:
+    with Path.open(metadata_path) as f:
         data = yaml.safe_load(f)
 
     # TO-DO: validate metadata here
@@ -77,9 +76,7 @@ def run_record_upload(
 
 
 def main():
-    """ 
-    Main function for uploading records to Invenio repository
-    """
+    """Upload records to Invenio repository."""
     try:
         usage = "upload_record [-h]"
         parser = argparse.ArgumentParser(
@@ -123,7 +120,7 @@ def main():
         op = parser.parse_args()
     except argparse.ArgumentError:
         logging.error(
-            "Command line arguments are ill-defined, please check the arguments."
+            "Command line arguments are ill-defined, please check the arguments.",
         )
         raise
         sys.exit(1)
@@ -131,8 +128,8 @@ def main():
     run_record_upload(
         api_url=op.api_url,
         api_key=op.api_key,
-        metadata_path=op.metadata_path, 
-        files=op.files, 
+        metadata_path=op.metadata_path,
+        files=op.files,
         community=op.community,
     )
 

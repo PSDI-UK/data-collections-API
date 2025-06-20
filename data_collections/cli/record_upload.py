@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import glob
 import logging
 from pathlib import Path
 import sys
@@ -31,7 +32,7 @@ def create_files_dict(all_files: list):
     files_dict = {}
     for file_str in all_files:
         # expand file_str if using wildcards
-        files = Path.glob(file_str)
+        files = glob.glob(file_str)
         for file in files:
             file_path = Path(file)
             files_dict[file_path.name] = file_path

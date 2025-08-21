@@ -26,7 +26,7 @@ creator_schema = Schema(
         Optional("affiliations"): [
             {
                 "name": str,
-            }
+            },
         ],
         "person_or_org": {
             Or("name", "family_name"): And(str, len),
@@ -46,7 +46,7 @@ metadata_schema = Schema(
         "rights": [
             {
                 "id": Or("cc-by-4.0"),
-            }
+            },
         ],
         "resource_type": {
             "id": Or("model"),

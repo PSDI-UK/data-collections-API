@@ -139,7 +139,6 @@ def pyyaml_loader(path: Path | str) -> dict[str, Any]:
     FIXME: Add docs.
 
     """
-
     path = Path(path)
 
     with path.open("r", encoding="utf8") as file:

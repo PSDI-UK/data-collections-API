@@ -6,8 +6,8 @@ import argparse
 from functools import singledispatch
 from pathlib import Path
 
-from .dumpers import Formats, get_dumper, get_loader, get_str_loader
-from .schema import schema
+from data_collections_api.dumpers import Formats, get_dumper, get_loader, get_str_loader
+from data_collections_api.schema import schema
 
 EXAMPLES_FOLDER = Path(__file__).parent.parent / "examples"
 
@@ -62,7 +62,7 @@ def _(data: dict):
 
 
 @validate_metadata.register(str)
-def _(data: str, fmt: Formats):
+def _(data: Path | str, fmt: Formats):
     try:
         data = get_str_loader(fmt)(data)
     except Exception:

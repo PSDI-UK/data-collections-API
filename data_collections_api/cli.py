@@ -6,7 +6,7 @@ import argparse
 from pathlib import Path
 
 from data_collections_api import __version__
-from data_collections_api.metadata import dump_example, validate_metadata
+from data_collections_api.metadata import dump_example, validate_cli
 
 
 def get_arg_parser() -> argparse.ArgumentParser:
@@ -38,7 +38,7 @@ def get_arg_parser() -> argparse.ArgumentParser:
         help="Parse FILE as this type.",
         default=None,
     )
-    sp.set_defaults(func=validate_metadata)
+    sp.set_defaults(func=validate_cli)
 
     # Dump
     sp = subparser.add_parser(

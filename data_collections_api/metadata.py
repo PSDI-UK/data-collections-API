@@ -57,12 +57,12 @@ def validate_metadata(_val, fmt: Formats | None = None):
 
 
 @validate_metadata.register(dict)
-def _(data: dict):
+def _(data: dict) -> dict:
     return schema.validate(data)
 
 
 @validate_metadata.register(str)
-def _(data: Path | str, fmt: Formats):
+def _(data: Path | str, fmt: Formats) -> dict:
     try:
         data = get_str_loader(fmt)(data)
     except Exception:
@@ -73,7 +73,7 @@ def _(data: Path | str, fmt: Formats):
 
 
 @validate_metadata.register(Path)
-def _(path: Path, fmt: Formats | None = None):
+def _(path: Path, fmt: Formats | None = None) -> dict:
     if fmt is None:
         match path.suffix:
             case ".json":
@@ -88,5 +88,24 @@ def _(path: Path, fmt: Formats | None = None):
 
 
 @validate_metadata.register(argparse.Namespace)
-def _(inp: argparse.Namespace):
-    return validate_metadata(inp.file, inp.format)
+def _(inp: argparse.Namespace) -> dict:
+    return  validate_metadata(inp.file, inp.format)
+
+def validate_cli(inp: argparse.Namespace) -> dict:
+    """Validate metadata and print success to screen.
+
+    Parameters
+    ----------
+    inp : argparse.Namespace
+        Input arguments from CLI.
+
+    Returns
+    -------
+    dict
+        Validated schema from file.
+
+    """
+    out = validate_metadata(inp)
+    if out:
+        print(f"{inp.file} valid.")
+    return out

@@ -9,7 +9,7 @@ from pathlib import Path
 from data_collections_api.dumpers import Formats, get_dumper, get_loader, get_str_loader
 from data_collections_api.schema import schema
 
-EXAMPLES_FOLDER = Path(__file__).parent.parent / "examples"
+EXAMPLES_FOLDER = Path(__file__).parent / "examples"
 
 
 @singledispatch

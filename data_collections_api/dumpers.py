@@ -114,7 +114,7 @@ def ruamel_loader(path: Path | str) -> dict[str, Any]:
     dict[str, Any]
         Parsed file.
     """
-    yaml_eng = ruamel.YAML()
+    yaml_eng = ruamel.YAML(typ="safe")
     path = Path(path)
 
     with path.open("r", encoding="utf8") as file:

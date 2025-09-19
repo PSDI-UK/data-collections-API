@@ -89,7 +89,7 @@ def _(path: Path, fmt: Formats | None = None) -> dict:
 
 @validate_metadata.register(argparse.Namespace)
 def _(inp: argparse.Namespace) -> dict:
-    return  validate_metadata(inp.file, inp.format)
+    return validate_metadata(inp.file, inp.format)
 
 def validate_cli(inp: argparse.Namespace) -> dict:
     """Validate metadata and print success to screen.

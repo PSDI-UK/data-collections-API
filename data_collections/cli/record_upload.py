@@ -38,11 +38,11 @@ def create_files_dict(all_files: list[Path | str]):
 
 
 def run_record_upload(
-    api_url="api_url",
-    api_key="api_key",
-    metadata_path="metadata_path",
-    files="files",
-    community="community",
+    api_url: str = "api_url",
+    api_key: str = "api_key",
+    metadata_path: Path = "metadata_path",
+    files: list[Path | str] = "files",
+    community: str = "community",
 ):
     """Run the uploading of metadata and associated files to an Invenio repository."""
     # create repo object
@@ -72,16 +72,6 @@ def run_record_upload(
 
     # submit draft for review
     repository.depositions.draft(draft_id).submit_review()
-
-
-class UploadRecordArgs(argparse.Namespace):
-    """Type-hints for upload_record arguments."""
-
-    api_url: str
-    api_key: str
-    metadata_path: Path
-    files: list[Path | str]
-    community: str
 
 
 def main():
@@ -128,7 +118,7 @@ def main():
         help="name of a Invenio repository community to upload the record to, "
         "e.g. biosimdb, data-to-knowledge, etc.",
     )
-    args = parser.parse_args(namespace=UploadRecordArgs())
+    args = parser.parse_args()
 
     run_record_upload(
         api_url=args.api_url,

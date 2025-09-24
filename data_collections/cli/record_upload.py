@@ -74,6 +74,16 @@ def run_record_upload(
     repository.depositions.draft(draft_id).submit_review()
 
 
+class UploadRecordArgs(argparse.Namespace):
+    """Type-hints for upload_record arguments."""
+
+    api_url: str
+    api_key: str
+    metadata_path: Path
+    files: list[Path | str]
+    community: str
+
+
 def main():
     """Upload records to Invenio repository."""
     usage = "upload_record [-h]"
@@ -86,43 +96,46 @@ def main():
     parser.add_argument(
         "--api_url",
         metavar="str",
-        default=None,
+        type=str,
         required=True,
-        help="url for the API associated with the Invenio repository",
+        help="url for the API associated with the Invenio "
+        "repository, e.g. https://data-collections-staging.psdi.ac.uk/api",
     )
     parser.add_argument(
         "--api_key",
         metavar="str",
-        default=None,
+        type=str,
         required=True,
-        help="key for accessing the Invenio repository",
+        help="your API key/token for accessing the Invenio repository instance",
     )
     parser.add_argument(
         "--metadata_path",
         metavar="file",
-        default=None,
         required=True,
-        help="file path for Invenio metadata yaml file",
+        help="file path to the yaml file containing the metadata to upload "
+        "a record to an Invenio repository, e.g. path/to/files/record.yaml",
     )
     parser.add_argument(
         "--files",
         nargs="+",
-        help="list of file paths associated with the record to be uploaded",
+        help="list of file paths associated with the record to be uploaded, "
+        "e.g. path/to/files/data.*",
     )
     parser.add_argument(
         "--community",
         metavar="str",
-        default=None,
-        help="name of community to upload record to, e.g. biosimdb",
+        type=str,
+        help="name of a Invenio repository community to upload the record to, "
+        "e.g. biosimdb, data-to-knowledge, etc.",
     )
-    op = parser.parse_args()
+    args = parser.parse_args(namespace=UploadRecordArgs())
 
     run_record_upload(
-        api_url=op.api_url,
-        api_key=op.api_key,
-        metadata_path=op.metadata_path,
-        files=op.files,
-        community=op.community,
+        api_url=args.api_url,
+        api_key=args.api_key,
+        metadata_path=args.metadata_path,
+        files=args.files,
+        community=args.community,
     )
 
 

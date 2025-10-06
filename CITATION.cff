@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: "data-collections-api"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Kasoar
+    given-names: Elliott
+    orcid: "https://orcid.org/0009-0005-2015-9478"
+  - family-names: Wilkins
+    given-names: Jacob
+    orcid: https://orcid.org/0009-0004-9147-3475
+  - family-names: Kalayan
+    given-names: Jas
+  - family-names: Elena
+    given-names: Alin
+    orcid: "https://orcid.org/0000-0002-7013-6670"
+repository-code: 'https://github.com/PSDI-UK/data-collections-API'
+abstract: Tools for depositing and retrieving from PSDI data collections repository
+license: MIT

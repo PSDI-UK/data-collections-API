@@ -49,7 +49,7 @@ Repository="https://github.com/PSDI-UK/data-collections-API.git"
 
 [project.scripts]
 data_collections = "data_collections_api.cli.data_collections_main:main"
-upload_record = "data_collections_api.cli.record_upload:main"
+upload_record = "data_collections_api.cli.record_upload:cli"
 
 [tool.setuptools.dynamic]
 version = {attr = "data_collections_api.__version__"}

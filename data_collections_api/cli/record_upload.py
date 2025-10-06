@@ -144,8 +144,12 @@ def main(args: argparse.Namespace):
         community=args.community,
     )
 
-
-if __name__ == "__main__":
+def cli():
+    """Run job through CLI."""
     parser = get_arg_parser()
     args = parser.parse_args()
     main(args)
+
+
+if __name__ == "__main__":
+    cli()

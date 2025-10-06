@@ -162,7 +162,7 @@ hand. GitHub provides instructions for this, or you can follow this routine,
 
 ``` sh
 # add upstream as a remote if you have not already
-$ git remote add upstream git@github.com:stfc/data-collections-API.git
+$ git remote add upstream git@github.com:PSDI-UK/data-collections-API.git
 # get the changes to upstream since you started working on your issue
 $ git fetch upstream
 # merge these changes into your branch (assuming you want to merge into the main branch on upstream)
@@ -178,7 +178,7 @@ merge and rebase.
 
 ``` sh
 # add upstream as a remote if you have not already
-$ git remote add upstream git@github.com:stfc/data-collections-API.git
+$ git remote add upstream git@github.com:PSDI-UK/data-collections-API.git
 # get the changes to upstream since you started working on your issue
 $ git fetch upstream
 # merge these changes into your branch (assuming you want to merge into the main branch on upstream)
@@ -199,10 +199,10 @@ GitHub also offers a sync functionality in their web UI that achieves the same.
 
 ``` sh
 # clone your fork
-$ git clone git@github.com:<username>/data-collections-API.git aiida-mlip-username
-pushd aiida-mlip-username
+$ git clone git@github.com:<username>/data-collections-API.git <dcapi-username>
+$ cd <dcapi-username>
 # add a remote for upstream
-$ git remote add upstream git@github.com:stfc/data-collections-API.git
+$ git remote add upstream git@github.com:PSDI-UK/data-collections-API.git
 ```
 
 These commands need to be done only once. `git remote -v` shall show you
@@ -212,8 +212,8 @@ the origin and project fetch and push links
 $ git remote -v
 origin  git@github.com:<username>/data-collections-API.git (fetch)
 origin  git@github.com:<username>/data-collections-API.git (push)
-upstream git@github.com:stfc/data-collections-API.git (fetch)
-upstream git@github.com:stfc/data-collections-API.git (push)
+upstream git@github.com:PSDI-UK/data-collections-API.git (fetch)
+upstream git@github.com:PSDI-UK/data-collections-API.git (push)
 ```
 
 When you need to sync your *fork* with *upstream*, do the following,

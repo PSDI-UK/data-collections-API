@@ -1,6 +1,9 @@
+[build-system]
+requires = ["setuptools >= 61.0.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "data-collections"
-# version = "0.1.0"
+name = "data-collections-api"
 description = "API for depositing and retrieving from PSDI data collections repository"
 authors = [
     { name = "Elliott Kasoar" },
@@ -25,7 +28,10 @@ keywords = ["psdi", "invenio", "zenodo"]
 dynamic = ["version"]
 
 
-dependencies = ["requests"]
+dependencies = [
+  "requests",
+  "schema"
+]
 
 [project.optional-dependencies]
 ruamel = ["ruamel.yaml>=0.17.22"]
@@ -41,10 +47,11 @@ Homepage="https://github.com/PSDI-UK/data-collections-API"
 Repository="https://github.com/PSDI-UK/data-collections-API.git"
 "Bug Tracker" = "https://github.com/PSDI-UK/data-collections-API/issues"
 
+[project.scripts]
+psdi-data = "data_collections_api.cli:main"
+
 [tool.setuptools.dynamic]
-version = {attr = "data_collections.__version__"}
-
-
+version = {attr = "data_collections_api.__version__"}
 
 [tool.ruff]
 line-length = 100

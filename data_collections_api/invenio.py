@@ -14,7 +14,7 @@ URL = NewType("URL", str)
 JSONResponse = NewType("JSONResponse", dict)
 
 
-def _check(request: requests.Request, proc: str) -> dict:
+def _check(request: requests.Response, proc: str) -> dict:
     """Verify that a request has succeeded.
 
     Parameters
@@ -181,7 +181,7 @@ class _File(_SubCommandHandler):
                 f"{self.api_url}",
                 params={**params, "access_token": self.api_key},
                 headers={
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
             ),
             f"deleting file {self.name} from record {self.rec_id}",
@@ -311,14 +311,13 @@ class _Files(_SubCommandHandler):
             file = Path(file)
             request_list.append(
                 _check(
-                requests.post(
-                    self.api_url,
-                    params={**params, "access_token": self.api_key},
-                    data=json.dumps([{"key": name}]),
-                    headers={"Content-Type": "application/json"},
-
-                ),
-                f"starting draft file upload for record {self.rec_id}",
+                    requests.post(
+                        self.api_url,
+                        params={**params, "access_token": self.api_key},
+                        data=json.dumps([{"key": name}]),
+                        headers={"Content-Type": "application/json"},
+                    ),
+                    f"starting draft file upload for record {self.rec_id}",
                 ),
             )
 
@@ -456,10 +455,9 @@ class _Draft(_SubCommandHandler):
             ),
             f"deleting record {self.rec_id}",
         )
-    
-    
+
     def bind(self, community_slug: str, **params) -> JSONResponse:
-        """Bind a draft record to a community
+        """Bind a draft record to a community.
 
         Parameters
         ----------
@@ -471,28 +469,32 @@ class _Draft(_SubCommandHandler):
         JSONResponse
             Status of operation.
         """
-
         response = _check(
             requests.get(
-                f"{self.url}/communities/{community_slug}"
-                ),
-                f"getting the ID for {community_slug} community",
-            )
+                f"{self.url}/communities/{community_slug}",
+            ),
+            f"getting the ID for {community_slug} community",
+        )
         community_id = response["id"]
 
-        return _check(
-            requests.put(
-                f"{self.api_url}/review",
-                params={**params, "access_token": self.api_key},
-                json={
-                    "receiver": {
-                        "community": f"{community_id}"
+        return (
+            _check(
+                requests.put(
+                    f"{self.api_url}/review",
+                    params={**params, "access_token": self.api_key},
+                    json={
+                        "receiver": {
+                            "community": f"{community_id}",
+                        },
+                        "type": "community-submission",
                     },
-                    "type": "community-submission"
-                },
+                ),
+                (
+                    f"binding draft record {self.rec_id} to "
+                    f"community {community_slug} with ID {community_id}"
+                ),
             ),
-            f"binding draft record {self.rec_id} to community {community_slug} with ID {community_id}",
-            ),
+        )
 
     def publish(self, **params) -> JSONResponse:
         """Publish draft record.
@@ -509,7 +511,7 @@ class _Draft(_SubCommandHandler):
             ),
             f"publishing record {self.rec_id}",
         )
-    
+
     def submit_review(self, **params) -> JSONResponse:
         """Submit draft record for review.
 
@@ -558,7 +560,7 @@ class _Record(_SubCommandHandler):
         str
             File bucket to ``put`` files.
         """
-        return self.get()["links"]["self"] #["bucket"]
+        return self.get()["links"]["self"]  # ["bucket"]
 
     def get(self, **params) -> JSONResponse:
         """Get information about record.
@@ -575,7 +577,7 @@ class _Record(_SubCommandHandler):
             ),
             f"getting record {self.rec_id}",
         )
-        self.bucket_url = request["links"]["self"] #["bucket"]
+        self.bucket_url = request["links"]["self"]  # ["bucket"]
         return request
 
     def update(self, data: object, **params) -> JSONResponse:
@@ -634,8 +636,7 @@ class _Record(_SubCommandHandler):
         )
 
     def edit(self, **params) -> JSONResponse:
-        """Edit record details.
-        Edit a published record (Create a draft record from a published record)
+        """Edit a published record (Create a draft record from a published record).
 
         Returns
         -------
@@ -713,7 +714,7 @@ class _AllRecords(_SubCommandHandler):
             ),
             f"getting record {rec_id}",
         )
-    
+
     def draft(self, rec_id, **params) -> _Draft:
         """Get draft file handler for this record.
 
@@ -729,7 +730,7 @@ class _AllRecords(_SubCommandHandler):
         _Draft
             Draft record handler.
         """
-        response =  _check(
+        response = _check(
             requests.get(
                 f"{self.api_url}/{rec_id}/draft",
                 params={**params, "access_token": self.api_key},
@@ -838,7 +839,7 @@ class _Licenses(_SubCommandHandler):
 class InvenioRepository:
     """Handler for Invenio-like repositories.
 
-    Handles pushing info to e.g. Zenodo
+    Handles pushing info to e.g. Zenodo.
 
     Parameters
     ----------

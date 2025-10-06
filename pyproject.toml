@@ -122,6 +122,6 @@ checks = [
 ]
 # Don't report on objects that match any of these regex
 exclude = [
-    ".__weakref__$",
-    ".__repr__$",
+    '\._$',
+    '\.__init__$',
 ]

@@ -6,6 +6,8 @@ import argparse
 from pathlib import Path
 
 from data_collections_api import __version__
+from data_collections_api.cli.record_upload import get_arg_parser as get_upload_parser
+from data_collections_api.cli.record_upload import main as upload_main
 from data_collections_api.metadata import dump_example, validate_cli
 
 
@@ -56,6 +58,15 @@ def get_arg_parser() -> argparse.ArgumentParser:
         default=None,
     )
     sp.set_defaults(func=dump_example)
+
+    # Upload
+    sp = subparser.add_parser(
+        "upload",
+        help="Upload a dataset to an invenio repository.",
+        description="Tool for uploading dataset to invenio repository.",
+    )
+    sp = get_upload_parser(sp)
+    sp.set_defaults(func=upload_main)
 
     return arg_parser
 

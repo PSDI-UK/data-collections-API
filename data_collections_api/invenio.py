@@ -636,7 +636,9 @@ class _Record(_SubCommandHandler):
         )
 
     def edit(self, **params) -> JSONResponse:
-        """Edit a published record (Create a draft record from a published record).
+        """Edit record details.
+
+        Edit a published record (Create a draft record from a published record).
 
         Returns
         -------

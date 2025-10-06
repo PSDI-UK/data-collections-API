@@ -48,7 +48,8 @@ Repository="https://github.com/PSDI-UK/data-collections-API.git"
 "Bug Tracker" = "https://github.com/PSDI-UK/data-collections-API/issues"
 
 [project.scripts]
-psdi-data = "data_collections_api.cli:main"
+data_collections = "data_collections_api.cli.data_collections_main:main"
+upload_record = "data_collections_api.cli.record_upload:cli"
 
 [tool.setuptools.dynamic]
 version = {attr = "data_collections_api.__version__"}

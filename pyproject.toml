@@ -40,6 +40,7 @@ docs = [
    "sphinx>=0.13.1",
    "sphinx-book-theme>=0.3.3",
    "sphinxcontrib-contentui<1.0.0,>=0.2.5",
+   "numpydoc",
 ]
 lint = ["pre-commit<5.0.0,>=4.2.0", "ruff", "numpydoc"]
 test = ["pytest==8.3.4", "pytest-cov==5.0.0"]

@@ -17,7 +17,6 @@ release = data_collections_api.__version__
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "aiida.sphinxext",
     "numpydoc",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",

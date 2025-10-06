@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Iterable
 import glob
 from pathlib import Path
 
@@ -12,7 +13,7 @@ import yaml
 from data_collections_api.invenio import InvenioRepository
 
 
-def create_files_dict(all_files: list[Path | str]):
+def create_files_dict(all_files: Iterable[Path | str]):
     """
     Save file paths into a dictionary to a format e.g.
 
@@ -38,11 +39,11 @@ def create_files_dict(all_files: list[Path | str]):
 
 
 def run_record_upload(
-    api_url: str = "api_url",
-    api_key: str = "api_key",
-    metadata_path: Path = "metadata_path",
-    files: list[Path | str] = "files",
-    community: str = "community",
+    api_url: str,
+    api_key: str,
+    metadata_path: Path,
+    files: Iterable[Path | str],
+    community: str,
 ):
     """Run the uploading of metadata and associated files to an Invenio repository."""
     # create repo object

@@ -308,7 +308,7 @@ class _Files(_SubCommandHandler):
         """
         request_list = []
         for name, file in files.items():
-            file = Path(file)
+            file_path = Path(file)
             request_list.append(
                 _check(
                     requests.post(
@@ -321,7 +321,7 @@ class _Files(_SubCommandHandler):
                 ),
             )
 
-            with file.open("rb") as curr_file:
+            with file_path.open("rb") as curr_file:
                 request_list.append(
                     _check(
                         requests.put(

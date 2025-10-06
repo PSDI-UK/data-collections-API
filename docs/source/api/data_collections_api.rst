@@ -1,0 +1,53 @@
+data\_collections\_api package
+==============================
+
+Submodules
+----------
+
+data\_collections\_api.cli module
+---------------------------------
+
+.. automodule:: data_collections_api.cli
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+data\_collections\_api.dumpers module
+-------------------------------------
+
+.. automodule:: data_collections_api.dumpers
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+data\_collections\_api.invenio module
+-------------------------------------
+
+.. automodule:: data_collections_api.invenio
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+data\_collections\_api.metadata module
+--------------------------------------
+
+.. automodule:: data_collections_api.metadata
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+data\_collections\_api.schema module
+------------------------------------
+
+.. automodule:: data_collections_api.schema
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: data_collections_api
+   :members:
+   :show-inheritance:
+   :undoc-members:

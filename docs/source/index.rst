@@ -6,11 +6,12 @@
 Data Collections API documentation
 ==================================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+Project to allow simplified editing and construction of Invenio data for the PSDI data collections mechanisms.
 
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   cli
+   api/data_collections_api

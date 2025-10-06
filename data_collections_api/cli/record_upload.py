@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from data_collections.invenio import InvenioRepository
+from data_collections_api.invenio import InvenioRepository
 
 
 def create_files_dict(all_files: list[Path | str]):
@@ -74,14 +74,26 @@ def run_record_upload(
     repository.depositions.draft(draft_id).submit_review()
 
 
-def main():
-    """Upload records to Invenio repository."""
-    usage = "upload_record [-h]"
-    parser = argparse.ArgumentParser(
-        description="Upload records to Invenio repository",
-        usage=usage,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
+def get_arg_parser(parser: argparse.ArgumentParser | None = None) -> argparse.ArgumentParser:
+    """Return an argument parser for uploads, or configure a subparser if passed.
+
+    Parameters
+    ----------
+    parser : ArgumentParser, optional
+        Parser (or SubParser) to configure.
+
+    Returns
+    -------
+    ArgumentParser
+        Configured parser for uploading records.
+    """
+    if parser is None:
+        parser = argparse.ArgumentParser(
+            description="Upload records to Invenio repository",
+            usage="upload_record [-h]",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
+
     parser.add_argument_group("Options")
     parser.add_argument(
         "--api_url",
@@ -118,8 +130,12 @@ def main():
         help="name of a Invenio repository community to upload the record to, "
         "e.g. biosimdb, data-to-knowledge, etc.",
     )
-    args = parser.parse_args()
 
+    return parser
+
+
+def main(args: argparse.Namespace):
+    """Upload records to Invenio repository."""
     run_record_upload(
         api_url=args.api_url,
         api_key=args.api_key,
@@ -130,4 +146,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = get_arg_parser()
+    args = parser.parse_args()
+    main(args)

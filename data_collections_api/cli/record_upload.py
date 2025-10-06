@@ -177,6 +177,7 @@ def main(args: argparse.Namespace):
         community=args.community,
     )
 
+
 def cli():
     """Run job through CLI."""
     parser = get_arg_parser()

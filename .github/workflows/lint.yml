@@ -1,0 +1,54 @@
+name: lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  vermin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install vermin
+        run: python -m pip install vermin
+      - name: Run Vermin
+        run: vermin -t=3.10- --lint --no-parse-comments data_collections_api
+
+  ruff-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: astral-sh/ruff-action@v3
+      with:
+        version: "0.13.3"
+
+  ruff-format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: astral-sh/ruff-action@v3
+      with:
+        args: "format --diff"
+        version: "0.13.3"
+
+  pre-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install ".[lint]"
+
+      - name: Run pre-commit
+        run: pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )

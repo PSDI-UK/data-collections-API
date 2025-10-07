@@ -13,7 +13,7 @@ import yaml
 from data_collections_api.invenio import InvenioRepository
 
 
-def create_files_dict(all_files: Iterable[Path | str]):
+def create_files_dict(all_files: Iterable[Path | str]) -> dict[str, Path]:
     """
     Save file paths into a dictionary to a format e.g.
 
@@ -22,11 +22,20 @@ def create_files_dict(all_files: Iterable[Path | str]):
         "name2.file": "path/to/name2.file",
     }
 
+    Parameters
+    ----------
+    all_files : Iterable[Path | str]
+        Files to load into dict.
+
     Returns
     -------
-    dict
+    dict[str, Path]
         Dictionary of file names and file paths.
 
+    Examples
+    --------
+    .. code-block:: Python
+       create_files_dict(["my_dir", "my_dir/example/*.cif"])
     """
     files_dict = {}
     for file_str in all_files:
@@ -45,7 +54,22 @@ def run_record_upload(
     files: Iterable[Path | str],
     community: str,
 ):
-    """Run the uploading of metadata and associated files to an Invenio repository."""
+    """
+    Run the uploading of metadata and associated files to an Invenio repository.
+
+    Parameters
+    ----------
+    api_url : str
+        FIXME: Add docs.
+    api_key : str
+        FIXME: Add docs.
+    metadata_path : Path
+        FIXME: Add docs.
+    files : list[Path | str]
+        FIXME: Add docs.
+    community : str
+        FIXME: Add docs.
+    """
     # create repo object
     repository = InvenioRepository(url=api_url, api_key=api_key)
 
@@ -76,7 +100,8 @@ def run_record_upload(
 
 
 def get_arg_parser(parser: argparse.ArgumentParser | None = None) -> argparse.ArgumentParser:
-    """Return an argument parser for uploads, or configure a subparser if passed.
+    """
+    Return an argument parser for uploads, or configure a subparser if passed.
 
     Parameters
     ----------
@@ -136,7 +161,14 @@ def get_arg_parser(parser: argparse.ArgumentParser | None = None) -> argparse.Ar
 
 
 def main(args: argparse.Namespace):
-    """Upload records to Invenio repository."""
+    """
+    Upload records to Invenio repository.
+
+    Parameters
+    ----------
+    args : Namespace
+        Arguments to pass to :func:`run_record_upload`.
+    """
     run_record_upload(
         api_url=args.api_url,
         api_key=args.api_key,
@@ -144,6 +176,7 @@ def main(args: argparse.Namespace):
         files=args.files,
         community=args.community,
     )
+
 
 def cli():
     """Run job through CLI."""

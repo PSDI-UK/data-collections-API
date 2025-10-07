@@ -12,7 +12,14 @@ from data_collections_api.metadata import dump_example, validate_cli
 
 
 def get_arg_parser() -> argparse.ArgumentParser:
-    """Build argument parser for PSDI data-collection-api."""
+    """
+    Build argument parser for PSDI data-collection-api.
+
+    Returns
+    -------
+    ArgumentParser
+        Configured parser for CLI.
+    """
     arg_parser = argparse.ArgumentParser(
         prog="PSDI Data",
         description="Single-utility API for data handling with remote depositories.",

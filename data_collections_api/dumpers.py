@@ -122,22 +122,18 @@ def ruamel_loader(path: Path | str) -> dict[str, Any]:
 
 
 def pyyaml_loader(path: Path | str) -> dict[str, Any]:
-    """PYYAML format loader.
+    """
+    PYYAML format loader.
 
     Parameters
     ----------
     path : Path | str
-        FIXME: Add docs.
+        Path to load.
 
     Returns
     -------
-    Loader
-        FIXME: Add docs.
-
-    Examples
-    --------
-    FIXME: Add docs.
-
+    dict[str, Any]
+        Parsed data.
     """
     path = Path(path)
 
@@ -146,7 +142,8 @@ def pyyaml_loader(path: Path | str) -> dict[str, Any]:
 
 
 def json_str_loader(data: str) -> dict[str, Any]:
-    """JSON format string loader.
+    """
+    JSON format string loader.
 
     Parameters
     ----------
@@ -162,7 +159,8 @@ def json_str_loader(data: str) -> dict[str, Any]:
 
 
 def pyyaml_str_loader(data: str) -> dict[str, Any]:
-    """YAML (pyyaml) format string loader.
+    """
+    YAML (pyyaml) format string loader.
 
     Parameters
     ----------
@@ -178,7 +176,8 @@ def pyyaml_str_loader(data: str) -> dict[str, Any]:
 
 
 def ruamel_str_loader(data: str) -> dict[str, Any]:
-    """YAML (ruamel.yaml) format string loader.
+    """
+    YAML (ruamel.yaml) format string loader.
 
     Parameters
     ----------

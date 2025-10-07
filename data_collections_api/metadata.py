@@ -14,7 +14,8 @@ EXAMPLES_FOLDER = Path(__file__).parent / "examples"
 
 @singledispatch
 def dump_example(out_file: Path, fmt: Formats | None = None):
-    """Dump an example schema.
+    """
+    Dump an example schema.
 
     Parameters
     ----------
@@ -44,11 +45,12 @@ def _(args: argparse.Namespace):
 
 @singledispatch
 def validate_metadata(_val, fmt: Formats | None = None):
-    """Verify and process project metadata.
+    """
+    Verify and process project metadata.
 
     Parameters
     ----------
-    path : Path | str
+    _val : Path | str
         Path to data to validate.
     fmt : Formats, optional
         Format to process.
@@ -93,7 +95,8 @@ def _(inp: argparse.Namespace) -> dict:
 
 
 def validate_cli(inp: argparse.Namespace) -> dict:
-    """Validate metadata and print success to screen.
+    """
+    Validate metadata and print success to screen.
 
     Parameters
     ----------
@@ -104,7 +107,6 @@ def validate_cli(inp: argparse.Namespace) -> dict:
     -------
     dict
         Validated schema from file.
-
     """
     out = validate_metadata(inp)
     if out:

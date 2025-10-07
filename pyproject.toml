@@ -18,7 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
+    "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Development Status :: 3 - Alpha",
 ]
@@ -37,8 +37,7 @@ dependencies = [
 ruamel = ["ruamel.yaml>=0.17.22"]
 yaml = ["pyYAML>=3.13"]
 docs = ["sphinx>=0.13.1", "sphinx-book-theme>=0.3.3", "sphinx-autodoc-typehints"]
-pre-commit = ["pre-commit<5.0.0,>=4.2.0"]
-lint = ["ruff"]
+lint = ["pre-commit<5.0.0,>=4.2.0", "ruff", "numpydoc"]
 test = ["pytest==8.3.4", "pytest-cov==5.0.0"]
 
 [project.urls]
@@ -57,7 +56,6 @@ version = {attr = "data_collections_api.__version__"}
 [tool.ruff]
 line-length = 100
 indent-width = 4
-target-version = "py310"
 
 # Exclude a variety of commonly ignored directories.
 extend-exclude = [
@@ -99,8 +97,7 @@ ignore = [
     "PLR0913",  # Too many arguments
     "PLR0912",  # Too many branches
     "PLR0915",  # Too many statements
-    "PLW2901",  # For loop variable overwritten
-    "PLR2004",  # Magic constant value
+    "COM812",   # Trailing comma
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -124,6 +121,6 @@ checks = [
 ]
 # Don't report on objects that match any of these regex
 exclude = [
-    ".__weakref__$",
-    ".__repr__$",
+    '\._$',
+    '\.__init__$',
 ]

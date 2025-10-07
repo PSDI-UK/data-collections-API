@@ -15,7 +15,8 @@ JSONResponse = NewType("JSONResponse", dict)
 
 
 def _check(request: requests.Response, proc: str) -> dict:
-    """Verify that a request has succeeded.
+    """
+    Verify that a request has succeeded.
 
     Parameters
     ----------
@@ -23,6 +24,11 @@ def _check(request: requests.Response, proc: str) -> dict:
         Job to check.
     proc : str
         Job type requested.
+
+    Returns
+    -------
+    dict
+        JSON response if valid.
 
     Raises
     ------
@@ -40,49 +46,87 @@ def _check(request: requests.Response, proc: str) -> dict:
 
 
 class _SubCommandHandler(ABC):  # noqa: B024 (abstract-base-class-without-abstract-method)
-    """Abstract base for general commands.
+    """
+    Abstract base for general commands.
 
     Parameters
     ----------
-    parent
+    parent : _SubCommandHandler
         Parent job holder.
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent: _SubCommandHandler):
         self.parent = parent
 
     @property
-    def url(self):
+    def url(self) -> URL:
+        """
+        URL of object up to this point.
+
+        Returns
+        -------
+        URL
+            API URL.
+        """
         return self.parent.url
 
     @property
-    def api_key(self):
-        return self.parent.api_key
-
-
-class _File(_SubCommandHandler):
-    @property
-    def api_url(self) -> URL:
-        return f"{self.parent.api_url}/{self.name}"
-
-    def __init__(self, parent, name):
-        super().__init__(parent)
-        self.name = name
-
-    @property
-    def rec_id(self) -> str:
-        """Get parent ID.
+    def api_key(self) -> str:
+        """
+        Backtrack API Key from root.
 
         Returns
         -------
         str
-            parent ID.
+            API key.
+        """
+        return self.parent.api_key
+
+
+class _File(_SubCommandHandler):
+    """
+    Abstract class handling files.
+
+    Parameters
+    ----------
+    parent : _SubCommandHandler
+        Structure which contains or should contain this file.
+    name : str
+        File name.
+    """
+
+    def __init__(self, parent: _SubCommandHandler, name: str):
+        super().__init__(parent)
+        self.name = name
+
+    @property
+    def api_url(self) -> URL:
+        """
+        API URL that points to this file.
+
+        Returns
+        -------
+        URL
+            API URL.
+        """
+        return f"{self.parent.api_url}/{self.name}"
+
+    @property
+    def rec_id(self) -> str:
+        """
+        Get parent ID.
+
+        Returns
+        -------
+        str
+            Parent ID.
         """
         return self.parent.rec_id
 
     @property
     def bucket_url(self):
-        """Get URL for new API file bucket.
+        """
+        Get URL for new API file bucket.
 
         Returns
         -------
@@ -92,7 +136,13 @@ class _File(_SubCommandHandler):
         return self.parent.bucket_url
 
     def info(self, **params) -> JSONResponse:
-        """Get information on a file.
+        """
+        Get information on a file.
+
+        Parameters
+        ----------
+        **params
+            Extra arguments to pass to JSON request.
 
         Returns
         -------
@@ -108,12 +158,15 @@ class _File(_SubCommandHandler):
         )
 
     def update(self, file: Path, **params) -> JSONResponse:
-        """Replace a file on a record.
+        """
+        Replace a file on a record.
 
         Parameters
         ----------
         file
             Source file to upload.
+        **params
+            Extra arguments to pass to JSON request.
 
         Returns
         -------
@@ -133,12 +186,15 @@ class _File(_SubCommandHandler):
         )
 
     def download(self, dest: Path = Path(), **params) -> JSONResponse:
-        """Download a file from a record.
+        """
+        Download a file from a record.
 
         Parameters
         ----------
         dest
             Folder to write files to.
+        **params
+            Extra arguments to pass to JSON request.
 
         Returns
         -------
@@ -169,7 +225,13 @@ class _File(_SubCommandHandler):
         return _check(request, f"downloading file {self.name} from record {self.rec_id}")
 
     def delete(self, **params) -> JSONResponse:
-        """Delete this file from the record.
+        """
+        Delete this file from the record.
+
+        Parameters
+        ----------
+        **params
+            Extra arguments to pass to JSON request.
 
         Returns
         -------
@@ -188,12 +250,15 @@ class _File(_SubCommandHandler):
         )
 
     def upload(self, file: Path, **params) -> JSONResponse:
-        """Upload a file to a record.
+        """
+        Upload a file to a record.
 
         Parameters
         ----------
         file
             Path to sourcefile to upload.
+        **params
+            Extra arguments to pass to JSON request.
 
         Returns
         -------
@@ -218,14 +283,20 @@ class _Files(_SubCommandHandler):
 
     @property
     def api_url(self) -> URL:
-        return f"{self.parent.api_url}/files"
+        """
+        API URL that points to this fileset.
 
-    def __init__(self, parent):
-        super().__init__(parent)
+        Returns
+        -------
+        URL
+            API URL.
+        """
+        return f"{self.parent.api_url}/files"
 
     @property
     def rec_id(self) -> str:
-        """Get record ID.
+        """
+        Get record ID.
 
         Returns
         -------
@@ -236,7 +307,8 @@ class _Files(_SubCommandHandler):
 
     @property
     def bucket_url(self) -> str:
-        """Get URL for new API file bucket.
+        """
+        Get URL for new API file bucket.
 
         Returns
         -------
@@ -245,11 +317,25 @@ class _Files(_SubCommandHandler):
         """
         return self.parent.bucket_url
 
-    def __getitem__(self, name) -> _File:
+    def __getitem__(self, name: str) -> _File:
+        """
+        Return a :class:`_File` belonging to the set of files.
+
+        Parameters
+        ----------
+        name : str
+            File name to extract.
+
+        Returns
+        -------
+        _File
+            File with referene belonging to this set of files.
+        """
         return _File(self, name)
 
     def list(self, **params) -> JSONResponse:
-        """Get information about all files in record.
+        """
+        Get information about all files in record.
 
         Parameters
         ----------
@@ -270,12 +356,15 @@ class _Files(_SubCommandHandler):
         )
 
     def sort(self, sorted_ids: dict[str, str], **params) -> JSONResponse:
-        """Re-order files in record.
+        """
+        Re-order files in record.
 
         Parameters
         ----------
         sorted_ids
             IDs of re-sorted files.
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -293,13 +382,16 @@ class _Files(_SubCommandHandler):
         )
 
     def upload(self, files: dict[str, Path], **params) -> JSONResponse:
-        """Upload a set of files to a record.
+        """
+        Upload a set of files to a record.
 
         Parameters
         ----------
         files
             Dictionary where the key is the name for the repo,
             and the value is a path to the file to upload.
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -308,7 +400,7 @@ class _Files(_SubCommandHandler):
         """
         request_list = []
         for name, file in files.items():
-            file = Path(file)
+            file_path = Path(file)
             request_list.append(
                 _check(
                     requests.post(
@@ -321,7 +413,7 @@ class _Files(_SubCommandHandler):
                 ),
             )
 
-            with file.open("rb") as curr_file:
+            with file_path.open("rb") as curr_file:
                 request_list.append(
                     _check(
                         requests.put(
@@ -347,12 +439,15 @@ class _Files(_SubCommandHandler):
         return request_list
 
     def download(self, dest: Path, **params) -> JSONResponse:
-        """Download all files from record.
+        """
+        Download all files from record.
 
         Parameters
         ----------
         dest
             Folder in which to write downloaded files.
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -367,19 +462,37 @@ class _Files(_SubCommandHandler):
 
 
 class _Draft(_SubCommandHandler):
-    """Draft handler."""
+    """
+    Draft handler.
 
-    @property
-    def api_url(self) -> URL:
-        return f"{self.parent.url}/records/{self.rec_id}/draft"
+    Parameters
+    ----------
+    parent : _SubCommandHandler
+        Parent object.
+    rec_id : str
+        Invenio ID of the draft.
+    """
 
-    def __init__(self, parent, rec_id):
+    def __init__(self, parent: _SubCommandHandler, rec_id: str):
         super().__init__(parent)
         self.rec_id = rec_id
 
     @property
+    def api_url(self) -> URL:
+        """
+        API URL that points to this draft.
+
+        Returns
+        -------
+        URL
+            API URL.
+        """
+        return f"{self.parent.url}/records/{self.rec_id}/draft"
+
+    @property
     def files(self) -> _Files:
-        """Get files container for this draft record.
+        """
+        Get files container for this draft record.
 
         Returns
         -------
@@ -390,7 +503,8 @@ class _Draft(_SubCommandHandler):
 
     @cached_property
     def bucket_url(self):
-        """Get URL for new API file bucket.
+        """
+        Get URL for new API file bucket.
 
         Returns
         -------
@@ -400,7 +514,13 @@ class _Draft(_SubCommandHandler):
         return self.get()
 
     def get(self, **params) -> JSONResponse:
-        """Get information about draft record.
+        """
+        Get information about draft record.
+
+        Parameters
+        ----------
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -418,12 +538,15 @@ class _Draft(_SubCommandHandler):
         return request
 
     def update(self, data: object, **params) -> JSONResponse:
-        """Update draft record information.
+        """
+        Update draft record information.
 
         Parameters
         ----------
         data
             Data to be json dumped.
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -441,7 +564,13 @@ class _Draft(_SubCommandHandler):
         )
 
     def delete(self, **params) -> JSONResponse:
-        """Delete draft record.
+        """
+        Delete draft record.
+
+        Parameters
+        ----------
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -457,12 +586,15 @@ class _Draft(_SubCommandHandler):
         )
 
     def bind(self, community_slug: str, **params) -> JSONResponse:
-        """Bind a draft record to a community.
+        """
+        Bind a draft record to a community.
 
         Parameters
         ----------
-        community_slug
+        community_slug : str
             Name of the community to bind the draft record to.
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -497,7 +629,13 @@ class _Draft(_SubCommandHandler):
         )
 
     def publish(self, **params) -> JSONResponse:
-        """Publish draft record.
+        """
+        Publish draft record.
+
+        Parameters
+        ----------
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -513,7 +651,13 @@ class _Draft(_SubCommandHandler):
         )
 
     def submit_review(self, **params) -> JSONResponse:
-        """Submit draft record for review.
+        """
+        Submit draft record for review.
+
+        Parameters
+        ----------
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -530,19 +674,37 @@ class _Draft(_SubCommandHandler):
 
 
 class _Record(_SubCommandHandler):
-    """Record handler."""
+    """
+    Record handler.
 
-    @property
-    def api_url(self) -> URL:
-        return f"{self.parent.api_url}/{self.rec_id}"
+    Parameters
+    ----------
+    parent : _SubCommandHandler
+        Parent object.
+    rec_id : str
+        Invenio ID for this record.
+    """
 
-    def __init__(self, parent, rec_id):
+    def __init__(self, parent: _SubCommandHandler, rec_id: str):
         super().__init__(parent)
         self.rec_id = rec_id
 
     @property
+    def api_url(self) -> URL:
+        """
+        API URL that points to this record.
+
+        Returns
+        -------
+        URL
+            API URL.
+        """
+        return f"{self.parent.api_url}/{self.rec_id}"
+
+    @property
     def files(self) -> _Files:
-        """Get files container for this record.
+        """
+        Get files container for this record.
 
         Returns
         -------
@@ -553,7 +715,8 @@ class _Record(_SubCommandHandler):
 
     @cached_property
     def bucket_url(self):
-        """Get URL for new API file bucket.
+        """
+        Get URL for new API file bucket.
 
         Returns
         -------
@@ -563,7 +726,13 @@ class _Record(_SubCommandHandler):
         return self.get()["links"]["self"]  # ["bucket"]
 
     def get(self, **params) -> JSONResponse:
-        """Get information about record.
+        """
+        Get information about record.
+
+        Parameters
+        ----------
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -581,12 +750,15 @@ class _Record(_SubCommandHandler):
         return request
 
     def update(self, data: object, **params) -> JSONResponse:
-        """Update record information.
+        """
+        Update record information.
 
         Parameters
         ----------
         data
             Data to be json dumped.
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -604,7 +776,13 @@ class _Record(_SubCommandHandler):
         )
 
     def delete(self, **params) -> JSONResponse:
-        """Delete record.
+        """
+        Delete record.
+
+        Parameters
+        ----------
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -620,7 +798,13 @@ class _Record(_SubCommandHandler):
         )
 
     def publish(self, **params) -> JSONResponse:
-        """Publish record.
+        """
+        Publish record.
+
+        Parameters
+        ----------
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -636,9 +820,15 @@ class _Record(_SubCommandHandler):
         )
 
     def edit(self, **params) -> JSONResponse:
-        """Edit record details.
+        """
+        Edit record details.
 
         Edit a published record (Create a draft record from a published record).
+
+        Parameters
+        ----------
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -654,7 +844,13 @@ class _Record(_SubCommandHandler):
         )
 
     def discard(self, **params) -> JSONResponse:
-        """Discard record.
+        """
+        Discard record.
+
+        Parameters
+        ----------
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -670,7 +866,13 @@ class _Record(_SubCommandHandler):
         )
 
     def new_version(self, **params) -> JSONResponse:
-        """Push new version of record.
+        """
+        Push new version of record.
+
+        Parameters
+        ----------
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -687,15 +889,39 @@ class _Record(_SubCommandHandler):
 
 
 class _AllRecords(_SubCommandHandler):
+    """Reference for all records in a repository."""
+
     @property
     def api_url(self):
+        """
+        API URL that points to these records.
+
+        Returns
+        -------
+        URL
+            API URL.
+        """
         return f"{self.url}/records"
 
-    def __getitem__(self, rec_id) -> _Record:
+    def __getitem__(self, rec_id: str) -> _Record:
+        """
+        Return a :class:`_Record` belonging to the set of records.
+
+        Parameters
+        ----------
+        rec_id : str
+            Record name to extract.
+
+        Returns
+        -------
+        _Record
+            Record with reference belonging to this set of files.
+        """
         return _Record(self, rec_id)
 
     def get(self, rec_id, **params) -> JSONResponse:
-        """Get information about specific record on depository.
+        """
+        Get information about specific record on depository.
 
         Parameters
         ----------
@@ -718,7 +944,8 @@ class _AllRecords(_SubCommandHandler):
         )
 
     def draft(self, rec_id, **params) -> _Draft:
-        """Get draft file handler for this record.
+        """
+        Get draft file handler for this record.
 
         Parameters
         ----------
@@ -742,7 +969,13 @@ class _AllRecords(_SubCommandHandler):
         return _Draft(self, response["id"])
 
     def create(self, **params) -> _Draft:
-        """Create new empty record.
+        """
+        Create new empty record.
+
+        Parameters
+        ----------
+        **params
+            Extra params for requests.
 
         Returns
         -------
@@ -761,7 +994,8 @@ class _AllRecords(_SubCommandHandler):
         return _Draft(self, response["id"])
 
     def list(self, **params) -> JSONResponse:
-        """Get information about all records on depository.
+        """
+        Get information about all records on depository.
 
         Parameters
         ----------
@@ -783,18 +1017,39 @@ class _AllRecords(_SubCommandHandler):
 
 
 class _Repository(_AllRecords):
+    """Object representing an Invenio repository."""
+
     @property
     def api_url(self):
+        """
+        API URL that points to this repository.
+
+        Returns
+        -------
+        URL
+            API URL.
+        """
         return f"{self.parent.url}/deposit/depositions"
 
 
 class _Licenses(_SubCommandHandler):
+    """Object representing set of licenses."""
+
     @property
     def api_url(self):
+        """
+        API URL that points to this set of licenses.
+
+        Returns
+        -------
+        URL
+            API URL.
+        """
         return f"{self.url}/licenses"
 
     def get(self, lic_id, **params) -> JSONResponse:
-        """Get information about specific license on depository.
+        """
+        Get information about specific license on depository.
 
         Parameters
         ----------
@@ -817,7 +1072,8 @@ class _Licenses(_SubCommandHandler):
         )
 
     def list(self, **params) -> JSONResponse:
-        """Get information about all licenses on depository.
+        """
+        Get information about all licenses on depository.
 
         Parameters
         ----------
@@ -839,7 +1095,8 @@ class _Licenses(_SubCommandHandler):
 
 
 class InvenioRepository:
-    """Handler for Invenio-like repositories.
+    """
+    Handler for Invenio-like repositories.
 
     Handles pushing info to e.g. Zenodo.
 

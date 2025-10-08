@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from contextlib import suppress
-from functools import partial
 import json
 from pathlib import Path
 from typing import Any, Literal, NamedTuple, TextIO
@@ -29,58 +28,61 @@ Loader = Callable[[Path | str], dict[str, Any]]
 StrLoader = Callable[[str], dict[str, Any]]
 
 
-class DumpLoad(NamedTuple):
-    """Holder for dumpers and loaders."""
+class Format(NamedTuple):
+    """Set of operations for a given loader format."""
 
+    #: Dumper for format.
     dumper: Dumper
+    #: Loader for format.
     loader: Loader
+    #: String loader for format.
     str_loader: StrLoader
 
 
-def json_dumper(data: Any, file: TextIO):
+def _json_dumper(data: Any, file: TextIO):
     """
     JSON format dumper.
 
     Parameters
     ----------
-    data
+    data : Any
         Data to dump.
-    file
+    file : TextIO
         File to dump to.
     """
     json.dump(data, file, indent=2)
 
 
-def ruamel_dumper(data: Any, file: TextIO):
+def _ruamel_dumper(data: Any, file: TextIO):
     """
     YAML (ruamel.yaml) format dumper.
 
     Parameters
     ----------
-    data
+    data : Any
         Data to dump.
-    file
+    file : TextIO
         File to dump to.
     """
     yaml_eng = ruamel.YAML(typ="safe")
     yaml_eng.dump(data, file)
 
 
-def pyyaml_dumper(data: Any, file: TextIO):
+def _pyyaml_dumper(data: Any, file: TextIO):
     """
     YAML (pyyaml) format dumper.
 
     Parameters
     ----------
-    data
+    data : Any
         Data to dump.
-    file
+    file : TextIO
         File to dump to.
     """
     yaml.dump(data, file)
 
 
-def json_loader(path: Path | str) -> dict[str, Any]:
+def _json_loader(path: Path | str) -> dict[str, Any]:
     """
     JSON format loader.
 
@@ -100,7 +102,7 @@ def json_loader(path: Path | str) -> dict[str, Any]:
         return json.load(file)
 
 
-def ruamel_loader(path: Path | str) -> dict[str, Any]:
+def _ruamel_loader(path: Path | str) -> dict[str, Any]:
     """
     YAML (ruamel.yaml) format loader.
 
@@ -121,7 +123,7 @@ def ruamel_loader(path: Path | str) -> dict[str, Any]:
         return yaml_eng.load(file)
 
 
-def pyyaml_loader(path: Path | str) -> dict[str, Any]:
+def _pyyaml_loader(path: Path | str) -> dict[str, Any]:
     """
     PYYAML format loader.
 
@@ -141,7 +143,7 @@ def pyyaml_loader(path: Path | str) -> dict[str, Any]:
         return yaml.safe_load(file)
 
 
-def json_str_loader(data: str) -> dict[str, Any]:
+def _json_str_loader(data: str) -> dict[str, Any]:
     """
     JSON format string loader.
 
@@ -158,7 +160,7 @@ def json_str_loader(data: str) -> dict[str, Any]:
     return json.loads(data)
 
 
-def pyyaml_str_loader(data: str) -> dict[str, Any]:
+def _pyyaml_str_loader(data: str) -> dict[str, Any]:
     """
     YAML (pyyaml) format string loader.
 
@@ -175,7 +177,7 @@ def pyyaml_str_loader(data: str) -> dict[str, Any]:
     return yaml.safe_load(data)
 
 
-def ruamel_str_loader(data: str) -> dict[str, Any]:
+def _ruamel_str_loader(data: str) -> dict[str, Any]:
     """
     YAML (ruamel.yaml) format string loader.
 
@@ -193,17 +195,19 @@ def ruamel_str_loader(data: str) -> dict[str, Any]:
     return yaml_eng.load(data)
 
 
-def get_load_dump(fmt: str, *, loader: bool, string: bool = False) -> Dumper | Loader | StrLoader:
+def get_load_dump(
+    fmt: Formats, *, loader: bool, string: bool = False
+) -> Dumper | Loader | StrLoader:
     """
     Get appropriate loader/dumper for unified interface.
 
     Parameters
     ----------
-    fmt
+    fmt : str
         Format to handle.
-    loader
+    loader : bool
         Whether to load loader.
-    string
+    string : bool, optional
         Whether for string or file.
 
     Returns
@@ -243,18 +247,77 @@ def get_load_dump(fmt: str, *, loader: bool, string: bool = False) -> Dumper | L
     return SUPPORTED_FORMATS[fmt][loader + string]
 
 
-get_dumper = partial(get_load_dump, loader=False)
-get_dumper.__doc__ = get_load_dump.__doc__.replace("loader/dumper", "dumper")
-get_loader = partial(get_load_dump, loader=True)
-get_loader.__doc__ = get_load_dump.__doc__.replace("loader/dumper", "loader")
-get_str_loader = partial(get_load_dump, loader=True, string=True)
-get_str_loader.__doc__ = get_load_dump.__doc__.replace("loader/dumper", "string loader")
+def get_dumper(fmt: Formats):
+    """
+    Get appropriate dumper for unified interface.
+
+    Parameters
+    ----------
+    fmt : Formats
+        Format to handle.
+
+    Returns
+    -------
+    Dumper
+        Dumping function.
+
+    See Also
+    --------
+    SUPPORTED_FORMATS
+        Acceptable values for `fmt`.
+    """
+    return get_load_dump(fmt, loader=False)
+
+
+def get_loader(fmt: Formats):
+    """
+    Get appropriate loader for unified interface.
+
+    Parameters
+    ----------
+    fmt : Formats
+        Format to handle.
+
+    Returns
+    -------
+    Loader
+        Loading function.
+
+    See Also
+    --------
+    SUPPORTED_FORMATS
+        Acceptable values for `fmt`.
+    """
+    return get_load_dump(fmt, loader=True)
+
+
+def get_str_loader(fmt: Formats):
+    """
+    Get appropriate loader for unified interface.
+
+    Parameters
+    ----------
+    fmt : Formats
+        Format to handle.
+
+    Returns
+    -------
+    StrLoader
+        String loading function.
+
+    See Also
+    --------
+    SUPPORTED_FORMATS
+        Acceptable values for `fmt`.
+    """
+    return get_load_dump(fmt, loader=True, string=True)
+
 
 #: Currently supported dumpers.
-SUPPORTED_FORMATS: dict[str, DumpLoad] = {
-    "json": DumpLoad(json_dumper, json_loader, json_str_loader),
-    "ruamel": DumpLoad(ruamel_dumper, ruamel_loader, ruamel_str_loader),
-    "pyyaml": DumpLoad(pyyaml_dumper, pyyaml_loader, pyyaml_str_loader),
+SUPPORTED_FORMATS: dict[str, Format] = {
+    "json": Format(_json_dumper, _json_loader, _json_str_loader),
+    "ruamel": Format(_ruamel_dumper, _ruamel_loader, _ruamel_str_loader),
+    "pyyaml": Format(_pyyaml_dumper, _pyyaml_loader, _pyyaml_str_loader),
 }
-#: Valid formats
+#: Valid formats.
 Formats = Literal["json", "yaml", "ruamel", "pyyaml"]

@@ -17,11 +17,6 @@ def create_files_dict(all_files: Iterable[Path | str]) -> dict[str, Path]:
     """
     Save file paths into a dictionary to a format e.g.
 
-    files_dict = {
-        "name1.file": "path/to/name1.file",
-        "name2.file": "path/to/name2.file",
-    }
-
     Parameters
     ----------
     all_files : Iterable[Path | str]
@@ -35,7 +30,13 @@ def create_files_dict(all_files: Iterable[Path | str]) -> dict[str, Path]:
     Examples
     --------
     .. code-block:: Python
-       create_files_dict(["my_dir", "my_dir/example/*.cif"])
+
+       files_dict = create_files_dict(["my_dir/*.file", "my_dir/example/*.cif"])
+       # files_dict = {
+       #    "name1.file": "my_dir/name1.file",
+       #    "name2.file": "my_dir/name2.file",
+       #    "name1.cif": "my_dir/example/name1.cif",
+       # }
     """
     files_dict = {}
     for file_str in all_files:
@@ -60,15 +61,15 @@ def run_record_upload(
     Parameters
     ----------
     api_url : str
-        FIXME: Add docs.
+        URL of repository.
     api_key : str
-        FIXME: Add docs.
+        Repository API key.
     metadata_path : Path
-        FIXME: Add docs.
+        Path to metadata file.
     files : list[Path | str]
-        FIXME: Add docs.
+        Files to upload.
     community : str
-        FIXME: Add docs.
+        Community to which files will be uploaded.
     """
     # create repo object
     repository = InvenioRepository(url=api_url, api_key=api_key)

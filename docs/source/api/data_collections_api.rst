@@ -1,16 +1,16 @@
 data\_collections\_api package
 ==============================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   data_collections_api.cli
+
 Submodules
 ----------
-
-data\_collections\_api.cli module
----------------------------------
-
-.. automodule:: data_collections_api.cli
-   :members:
-   :show-inheritance:
-   :undoc-members:
 
 data\_collections\_api.dumpers module
 -------------------------------------

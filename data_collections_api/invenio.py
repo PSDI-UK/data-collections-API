@@ -1102,7 +1102,7 @@ class InvenioRepository:
 
     Parameters
     ----------
-    url
+    url : URL
         Repository URL.
     api_key : str
         API key with appropriate permissions.
@@ -1119,8 +1119,8 @@ class InvenioRepository:
         my_repo.licenses.list()
     """
 
-    def __init__(self, url: str, api_key: str, *, is_zenodo: bool = False):
-        self.url = url.strip("/").removesuffix("/api") + "/api"
+    def __init__(self, url: URL | str, api_key: str, *, is_zenodo: bool = False):
+        self.url = URL(url.strip("/").removesuffix("/api") + "/api")
         self.api_key = api_key
 
         self.depositions = _Repository(self) if is_zenodo else _AllRecords(self)

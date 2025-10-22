@@ -313,6 +313,46 @@ def get_str_loader(fmt: Formats):
     return get_load_dump(fmt, loader=True, string=True)
 
 
+def guess_format(path: Path, *, raise_on_invalid: bool = True) -> Formats | None:
+    """
+    Guess format from path suffix.
+
+    Parameters
+    ----------
+    path : Path
+        Path to guess format of.
+    raise_on_invalid : bool
+        Whether to raise on unrecognised or return ``None``.
+
+    Returns
+    -------
+    Formats or None
+        Expected format.
+
+    Raises
+    ------
+    NotImplementedError
+        Unknown format found.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> guess_format(Path("my_file.json"))
+    'json'
+    >>> guess_format(Path("my_file.yml"))
+    'yaml'
+    """
+    match path.suffix:
+        case ".json":
+            return "json"
+        case ".yaml" | ".yml":
+            return "yaml"
+        case _ if raise_on_invalid:
+            raise NotImplementedError(f"Cannot infer type of file {path.suffix!r}")
+        case _:
+            return None
+
+
 #: Currently supported dumpers.
 SUPPORTED_FORMATS: dict[str, Format] = {
     "json": Format(_json_dumper, _json_loader, _json_str_loader),

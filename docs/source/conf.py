@@ -23,12 +23,17 @@ version = ".".join(release.split(".")[:2])
 
 extensions = [
     "numpydoc",
+    "sphinx.ext.apidoc",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinxcontrib.contentui",
+]
+
+apidoc_modules = [
+    {"path": "../../data_collections_api", "destination": "./api"},
 ]
 
 always_use_bars_union = True

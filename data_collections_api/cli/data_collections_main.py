@@ -21,7 +21,7 @@ def get_arg_parser() -> argparse.ArgumentParser:
         Configured parser for CLI.
     """
     arg_parser = argparse.ArgumentParser(
-        prog="PSDI Data",
+        prog="data_collections",
         description="Single-utility API for data handling with remote depositories.",
     )
     arg_parser.add_argument(
@@ -44,7 +44,7 @@ def get_arg_parser() -> argparse.ArgumentParser:
         "-f",
         "--format",
         choices=["json", "yaml"],
-        help="Parse FILE as this type.",
+        help="Parse FILE as this type (default: determine from suffix).",
         default=None,
     )
     sp.set_defaults(func=validate_cli)
@@ -60,8 +60,8 @@ def get_arg_parser() -> argparse.ArgumentParser:
     sp.add_argument(
         "-f",
         "--format",
-        choices=["json", "yaml"],
-        help="Parse FILE as this type.",
+        choices=("json", "yaml"),
+        help="Parse FILE as this type (default: determine from suffix).",
         default=None,
     )
     sp.set_defaults(func=dump_example)

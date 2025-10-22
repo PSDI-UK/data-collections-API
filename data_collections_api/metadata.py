@@ -6,8 +6,8 @@ import argparse
 from functools import singledispatch
 from pathlib import Path
 
+from data_collections_api.base_schema import base_schema as schema
 from data_collections_api.dumpers import Formats, get_dumper, get_loader, get_str_loader
-from data_collections_api.schema import schema
 
 EXAMPLES_FOLDER = Path(__file__).parent / "examples"
 

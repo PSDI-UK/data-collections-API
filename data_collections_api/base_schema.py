@@ -59,7 +59,7 @@ metadata_schema = Schema(
     },
 )
 
-schema = Schema(
+base_schema = Schema(
     {
         Optional("access", default={"files": "public", "record": "public"}): {
             Optional("embargo"): {

@@ -8,9 +8,9 @@ from collections.abc import Iterable
 import glob
 from pathlib import Path
 
-import yaml
-
+from data_collections_api.dumpers import Formats, get_loader
 from data_collections_api.invenio import InvenioRepository
+from data_collections_api.metadata import validate_metadata
 
 
 def create_files_dict(all_files: Iterable[Path | str]) -> dict[str, Path]:
@@ -52,9 +52,10 @@ def run_record_upload(
     api_url: str,
     api_key: str,
     metadata_path: Path,
+    metadata_format: Formats,
     files: Iterable[Path | str],
     community: str,
-):
+) -> None:
     """
     Run the uploading of metadata and associated files to an Invenio repository.
 
@@ -66,6 +67,8 @@ def run_record_upload(
         Repository API key.
     metadata_path : Path
         Path to metadata file.
+    metadata_format : Formats
+        Format of metadata file (json or yaml).
     files : list[Path | str]
         Files to upload.
     community : str
@@ -75,10 +78,10 @@ def run_record_upload(
     repository = InvenioRepository(url=api_url, api_key=api_key)
 
     # open metadata record
-    with Path.open(metadata_path) as f:
-        data = yaml.safe_load(f)
+    loader = get_loader(metadata_format)
+    data = loader(metadata_path)
 
-    # TO-DO: validate metadata here
+    validate_metadata(data)
 
     # convert list of file paths to a dictionary
     files_dict = create_files_dict(files)
@@ -117,44 +120,49 @@ def get_arg_parser(parser: argparse.ArgumentParser | None = None) -> argparse.Ar
     if parser is None:
         parser = argparse.ArgumentParser(
             description="Upload records to Invenio repository",
-            usage="upload_record [-h]",
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
 
     parser.add_argument_group("Options")
     parser.add_argument(
-        "--api_url",
-        metavar="str",
+        "--api-url",
+        metavar="URL",
         type=str,
         required=True,
-        help="url for the API associated with the Invenio "
+        help="URL for the API associated with the Invenio "
         "repository, e.g. https://data-collections-staging.psdi.ac.uk/api",
     )
     parser.add_argument(
-        "--api_key",
+        "--api-key",
         metavar="str",
         type=str,
         required=True,
-        help="your API key/token for accessing the Invenio repository instance",
+        help="Your API key/token for accessing the Invenio repository instance.",
     )
     parser.add_argument(
-        "--metadata_path",
+        "--metadata-path",
         metavar="file",
         required=True,
-        help="file path to the yaml file containing the metadata to upload "
+        help="File path to the yaml file containing the metadata to upload "
         "a record to an Invenio repository, e.g. path/to/files/record.yaml",
+    )
+    parser.add_argument(
+        "-f",
+        "--metadata-format",
+        choices=("json", "yaml"),
+        default="yaml",
+        help="Parse metadata file as this type (default: %(default)s).",
     )
     parser.add_argument(
         "--files",
         nargs="+",
-        help="list of file paths associated with the record to be uploaded, "
+        help="List of file paths associated with the record to be uploaded, "
         "e.g. path/to/files/data.*",
     )
     parser.add_argument(
         "--community",
         metavar="str",
         type=str,
-        help="name of a Invenio repository community to upload the record to, "
+        help="Name of a Invenio repository community to upload the record to, "
         "e.g. biosimdb, data-to-knowledge, etc.",
     )
 
@@ -174,6 +182,7 @@ def main(args: argparse.Namespace):
         api_url=args.api_url,
         api_key=args.api_key,
         metadata_path=args.metadata_path,
+        metadata_format=args.metadata_format,
         files=args.files,
         community=args.community,
     )

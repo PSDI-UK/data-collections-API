@@ -1115,7 +1115,7 @@ class InvenioRepository:
 
         my_repo = InvenioRepository(url="companyname.website", api_key="abc123")
         my_repo.depositions["my_repo"].files["file"].upload(my_file)
-        my_repo.records.get()
+        my_repo.depositions.get()
         my_repo.licenses.list()
     """
 

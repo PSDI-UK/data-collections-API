@@ -40,7 +40,7 @@ docs = [
    "sphinx>=0.13.1",
    "sphinxcontrib-contentui<1.0.0,>=0.2.5",
    "furo==2025.9.25",
-   "numpydoc>=0.19.0",
+   "numpydoc>=1.9.0",
 ]
 lint = ["pre-commit<5.0.0,>=4.2.0", "ruff==0.13.3", "numpydoc>=0.19.0"]
 test = ["pytest==8.3.4", "pytest-cov==5.0.0"]

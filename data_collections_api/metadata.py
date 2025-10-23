@@ -7,13 +7,23 @@ from functools import singledispatch
 from pathlib import Path
 
 from data_collections_api.base_schema import base_schema as schema
-from data_collections_api.dumpers import Formats, get_dumper, get_loader, get_str_loader
+from data_collections_api.dumpers import (
+    Formats,
+    get_dumper,
+    get_loader,
+    get_str_loader,
+    guess_format,
+)
 
 EXAMPLES_FOLDER = Path(__file__).parent / "examples"
 
 
 @singledispatch
-def dump_example(out_file: Path, fmt: Formats | None = None):
+def dump_example(
+    out_file: Path,
+    fmt: Formats | None = None,
+    in_file: Path = EXAMPLES_FOLDER / "bare_example.yml",
+):
     """
     Dump an example schema.
 
@@ -23,17 +33,12 @@ def dump_example(out_file: Path, fmt: Formats | None = None):
         File to write to.
     fmt : Formats
         Format to dump as.
+    in_file : Path
+        File to read data from.
     """
-    if fmt is None:
-        match out_file.suffix:
-            case ".json":
-                fmt = "json"
-            case ".yaml" | ".yml":
-                fmt = "yaml"
-            case _:
-                raise NotImplementedError(f"Cannot infer type of file {out_file.suffix!r}")
+    fmt = fmt or guess_format(out_file)
 
-    test = validate_metadata(EXAMPLES_FOLDER / "bare_example.yml")
+    test = validate_metadata(in_file)
     with out_file.open("w", encoding="utf8") as file:
         get_dumper(fmt)(test, file)
 
@@ -76,15 +81,7 @@ def _(data: Path | str, fmt: Formats) -> dict:
 
 @validate_metadata.register(Path)
 def _(path: Path, fmt: Formats | None = None) -> dict:
-    if fmt is None:
-        match path.suffix:
-            case ".json":
-                fmt = "json"
-            case ".yaml" | ".yml":
-                fmt = "yaml"
-            case _:
-                raise NotImplementedError(f"Cannot infer type of file {path.suffix!r}")
-
+    fmt = fmt or guess_format(path)
     data = get_loader(fmt)(path)
     return schema.validate(data)
 

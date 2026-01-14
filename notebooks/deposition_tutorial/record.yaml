@@ -1,0 +1,35 @@
+metadata:
+  creators:
+  - affiliations:
+    - name: # name of institution
+    person_or_org:
+      given_name: # given name
+      family_name: # family name
+      identifiers:
+      - identifier: # identifier number
+        scheme: orcid
+      name: # family name, given name
+      type: personal
+  title: # title
+  description: # <p>A description of the data being uploaded</p>
+  identifiers:
+  - identifier: # link to publication
+  publication_date: # 'YYY-MM-DD'
+  subjects:
+  - subject: # <subject>
+  - subject: # <subject>
+  publisher: PSDI
+  resource_type:
+    id: model
+  rights:
+  - id: cc-by-4.0
+  version: v1
+custom_fields:
+  dsmd:
+  - # field1: 'value'
+  # field2: 'value'
+access:
+  files: public
+  record: public
+files:
+  enabled: true

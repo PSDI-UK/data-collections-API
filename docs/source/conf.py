@@ -8,8 +8,16 @@
 from __future__ import annotations
 
 import time
+import sys
+from pathlib import Path
+
+DOCS_SRC = Path(__file__).parent.resolve()
+sys.path.append(str(DOCS_SRC.parents[2]))
+sys.path.append(str(DOCS_SRC))
 
 import data_collections_api
+from scripts.schema_gen import main as gen_schema
+
 
 project = "Data Collections API"
 copyright_first_year = "2024"
@@ -24,12 +32,26 @@ version = ".".join(release.split(".")[:2])
 extensions = [
     "numpydoc",
     "sphinx.ext.autodoc",
+    "sphinx.ext.apidoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinxcontrib.contentui",
+    "myst_parser",
 ]
+
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".txt": "markdown",
+    ".md": "markdown",
+}
+
+apidoc_modules = [
+    {"path": "../../data_collections_api", "destination": "api/"},
+]
+
+gen_schema(["-Fv", f"-o={DOCS_SRC / 'schemas'}", "-O=%s.md", "all"])
 
 always_use_bars_union = True
 napoleon_include_special_with_doc = True
@@ -44,7 +66,6 @@ numpydoc_validation_checks = {"all", "EX01", "SA01", "ES01"}
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
 }
-
 
 templates_path = ["_templates"]
 exclude_patterns = []

@@ -1,5 +1,5 @@
-API Documentation
-=================
+data_collections_api
+====================
 
 .. toctree::
    :maxdepth: 4

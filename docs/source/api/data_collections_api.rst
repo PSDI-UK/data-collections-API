@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    data_collections_api.cli
+   data_collections_api.schemas
 
 Submodules
 ----------
@@ -32,14 +33,6 @@ data\_collections\_api.metadata module
 --------------------------------------
 
 .. automodule:: data_collections_api.metadata
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-data\_collections\_api.schema module
-------------------------------------
-
-.. automodule:: data_collections_api.schema
    :members:
    :show-inheritance:
    :undoc-members:

@@ -6,7 +6,7 @@ from collections.abc import Callable
 from contextlib import suppress
 import json
 from pathlib import Path
-from typing import Any, Literal, NamedTuple, TextIO
+from typing import Any, Literal, NamedTuple, TextIO, overload
 
 _YAML_TYPE = None
 
@@ -311,6 +311,22 @@ def get_str_loader(fmt: Formats):
         Acceptable values for `fmt`.
     """
     return get_load_dump(fmt, loader=True, string=True)
+
+
+@overload
+def guess_format(path: Path) -> Formats: ...  # numpydoc ignore=GL08
+
+
+@overload
+def guess_format(
+    path: Path, *, raise_on_invalid: Literal[True]
+) -> Formats: ...  # numpydoc ignore=GL08
+
+
+@overload
+def guess_format(
+    path: Path, *, raise_on_invalid: Literal[False]
+) -> Formats | None: ...  # numpydoc ignore=GL08
 
 
 def guess_format(path: Path, *, raise_on_invalid: bool = True) -> Formats | None:

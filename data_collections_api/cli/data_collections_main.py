@@ -9,6 +9,7 @@ from data_collections_api import __version__
 from data_collections_api.cli.record_upload import get_arg_parser as get_upload_parser
 from data_collections_api.cli.record_upload import main as upload_main
 from data_collections_api.metadata import dump_example, validate_cli
+from data_collections_api.schemas import SCHEMAS
 
 
 def get_arg_parser() -> argparse.ArgumentParser:
@@ -46,6 +47,13 @@ def get_arg_parser() -> argparse.ArgumentParser:
         choices=["json", "yaml"],
         help="Parse FILE as this type (default: determine from suffix).",
         default=None,
+    )
+    sp.add_argument(
+        "-S",
+        "--schema",
+        choices=SCHEMAS.keys(),
+        help="Validate against given schema (default: default).",
+        default="default",
     )
     sp.set_defaults(func=validate_cli)
 

@@ -6,7 +6,6 @@ import argparse
 from functools import singledispatch
 from pathlib import Path
 
-from data_collections_api.base_schema import base_schema as schema
 from data_collections_api.dumpers import (
     Formats,
     get_dumper,
@@ -14,6 +13,7 @@ from data_collections_api.dumpers import (
     get_str_loader,
     guess_format,
 )
+from data_collections_api.schemas import Schema, get_schema
 
 EXAMPLES_FOLDER = Path(__file__).parent / "examples"
 
@@ -64,31 +64,31 @@ def validate_metadata(_val, fmt: Formats | None = None):
 
 
 @validate_metadata.register(dict)
-def _(data: dict) -> dict:
-    return schema.validate(data)
+def _(data: dict, schema: Schema | str) -> dict:
+    return get_schema(schema).validate(data)
 
 
 @validate_metadata.register(str)
-def _(data: Path | str, fmt: Formats) -> dict:
+def _(data: Path | str, schema: Schema | str, fmt: Formats) -> dict:
     try:
         data = get_str_loader(fmt)(data)
     except Exception:
         data = Path(data)
         return validate_metadata(data)
-    else:
-        return schema.validate(data)
+
+    return get_schema(schema).validate(data)
 
 
 @validate_metadata.register(Path)
-def _(path: Path, fmt: Formats | None = None) -> dict:
+def _(path: Path, schema: Schema | str, fmt: Formats | None = None) -> dict:
     fmt = fmt or guess_format(path)
     data = get_loader(fmt)(path)
-    return schema.validate(data)
+    return get_schema(schema).validate(data)
 
 
 @validate_metadata.register(argparse.Namespace)
 def _(inp: argparse.Namespace) -> dict:
-    return validate_metadata(inp.file, inp.format)
+    return validate_metadata(inp.file, inp.schema, inp.format)
 
 
 def validate_cli(inp: argparse.Namespace) -> dict:

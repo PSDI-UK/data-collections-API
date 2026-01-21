@@ -8,4 +8,3 @@ This page documents the available schemas.
    :caption: Schemas:
 
    base
-

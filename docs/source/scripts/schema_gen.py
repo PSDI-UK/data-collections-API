@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 from shutil import rmtree
+import sys
 from textwrap import indent
 from typing import TYPE_CHECKING
 
@@ -171,6 +172,42 @@ def get_filename(fmt: str, key: str) -> str:
     return fmt % key
 
 
+def clear_folder(folder: Path, *, force: bool = False, verbose: bool = False) -> None:
+    """Delete folder and create new (empty) one.
+
+    Parameters
+    ----------
+    folder : Path
+        Folder to clear.
+    force : bool
+        Do not ask whether to remove folder.
+    verbose : bool
+        Print status.
+    """
+    if not folder.exists():
+        return
+
+    if folder.samefile(Path.cwd()):
+        print("Cannot clear folder as this is current working directory.")
+        return
+
+    if (
+        not force
+        and input(f"Running this will clear {folder}, are you sure you want to continue? [y/N] ")
+        .strip()
+        .lower()
+        != "y"
+    ):
+        print("Cancelling.")
+        sys.exit()
+
+    if verbose:
+        print(f"Deleting {folder}...")
+
+    rmtree(folder, ignore_errors=True)
+    folder.mkdir()
+
+
 def main(args_in: Sequence[str] | None = None, /) -> None:
     """Parse schemas and dump to file.
 
@@ -193,25 +230,8 @@ def main(args_in: Sequence[str] | None = None, /) -> None:
     if args.verbose:
         print(f"Generating schemas for keys {', '.join(map(repr, schemas.values()))}...")
 
-    if args.clear and args.out_folder.exists() and not args.out_folder.samefile(Path.cwd()):
-        if (
-            not args.force
-            and input(
-                f"Running this will clear {args.out_folder},"
-                " are you sure you want to continue? [y/N] "
-            )
-            .strip()
-            .lower()
-            != "y"
-        ):
-            print("Cancelling.")
-            return
-
-        if args.verbose:
-            print(f"Deleting {args.out_folder}...")
-
-        rmtree(args.out_folder, ignore_errors=True)
-        args.out_folder.mkdir()
+    if args.clear:
+        clear_folder(args.out_folder, force=args.force, verbose=args.verbose)
 
     for key, out_name in zip(schemas.values(), out_names, strict=True):
         out_path = args.out_folder / out_name

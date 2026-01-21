@@ -125,6 +125,10 @@ validate
 
       Parse :option:`FILE` as this type (default: determine from suffix).
 
+   .. option:: -S SCHEMA, --schema SCHEMA
+
+      Validate against the given schema (default: :doc:`base`)
+
 Validate the metadata file for a dataset before uploading.
 
 ``data_collections_api`` can validate your metadata file against the schema to verify the contents

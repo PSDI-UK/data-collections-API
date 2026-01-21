@@ -11,7 +11,7 @@ authors = [
     { name = "Jas Kalayan" },
     { name = "Alin M. Elena" },
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.10",
@@ -37,7 +37,7 @@ dependencies = [
 ruamel = ["ruamel.yaml>=0.17.22"]
 yaml = ["pyYAML>=3.13"]
 docs = [
-   "sphinx>=8.2",
+   "sphinx>=0.13.1",
    "sphinxcontrib-contentui<1.0.0,>=0.2.5",
    "furo==2025.9.25",
    "numpydoc>=1.9.0",

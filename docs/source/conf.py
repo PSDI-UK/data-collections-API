@@ -32,7 +32,7 @@ version = ".".join(release.split(".")[:2])
 extensions = [
     "numpydoc",
     "sphinx.ext.autodoc",
-    "sphinx.ext.apidoc",
+    # "sphinx.ext.apidoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",

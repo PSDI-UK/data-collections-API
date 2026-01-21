@@ -14,4 +14,6 @@ Project to allow simplified editing and construction of Invenio data for the PSD
    :caption: Contents:
 
    cli
-   api/modules
+   schema
+   schemas/index
+   API Documentation <api/modules>

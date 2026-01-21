@@ -41,6 +41,8 @@ docs = [
    "sphinxcontrib-contentui<1.0.0,>=0.2.5",
    "furo==2025.9.25",
    "numpydoc>=1.9.0",
+   "myst-parser",
+   "jsonschema-markdown",
 ]
 lint = ["pre-commit<5.0.0,>=4.2.0", "ruff==0.13.3", "numpydoc>=0.19.0"]
 test = ["pytest==8.3.4", "pytest-cov==5.0.0"]

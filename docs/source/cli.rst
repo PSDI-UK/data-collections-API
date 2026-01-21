@@ -1,107 +1,224 @@
 CLI Usage
 =========
 
-``data_collections_api`` provides a few commandline tools for
-simplifying the process of uploading or verifying data.
+``data_collections_api`` provides a few command-line tools for simplifying the process of uploading
+or verifying data and metadata.
 
 data_collections
 ----------------
 
-.. code-block:: text
+.. program:: data_collections
+.. describe:: data_collections
 
-   usage: data_collections [-h] [-V] {validate,template,dump,upload} ...
+   .. option:: operation {validate,template,dump,upload}
 
-   Single-utility API for data handling with remote depositories.
+      .. option:: validate
 
-   positional arguments:
-     {validate,template,dump,upload}
-       validate            Validate metadata
-       template (dump)     Dump a template file.
-       upload              Upload a dataset to an invenio repository.
+         Validate metadata
 
-   options:
-     -h, --help            show this help message and exit
-     -V, --version         show program's version number and exit
+      .. option:: template
+      .. option:: dump
 
-``data_collections`` is the general top-level interface to the
-tools. These tools are implemented as sub-parsers within the main
-module.
+         Dump a template file.
 
+      .. option:: `upload`
+
+         Upload a dataset to an invenio repository.
+
+   .. option:: -V, --version
+
+      Show program's version number and exit.
+
+``data_collections`` is the general top-level interface to the tools. These tools are implemented as
+sub-parsers within the main module.
+
+.. admonition:: Running ``data_collections``
+
+   By default, if the ``data_collections_api`` package is installed, ``data_collections`` is
+   installed as an executable script on your main ``PATH``. In general, this is the main entry
+   point.
+
+   If that is not desired, it is possible to run ``data_collections`` through the python module
+   system::
+
+     python -m data_collections_api
+
+   where the ``data_collections_api`` **module** (folder) is on the current ``sys.path`` (by being
+   installed, in the current ``PYTHONPATH`` or being in the current working directory.)::
+
+     PYTHONPATH=/path/containing/data_collections_api python -m data_collections_api
+
+   Throughout the rest of this page, we will assume ``data_collections`` is used as the main
+   entrypoint.
+
+
+.. _upload:
 
 upload
 ******
 
-Construct a set of data and upload a set of files along with the metadata to an
-Invenio repository. This is an alias for ``upload_record``.
+.. program:: data_collections upload
+.. describe:: data_collections upload
+
+   .. option:: --api-url URL
+
+      URL for the API associated with the Invenio repository, e.g.
+      https://data-collections-staging.psdi.ac.uk/api
+
+   .. option:: --api-key str
+
+      Your API key/token for accessing the Invenio repository instance.
+
+   .. option:: --metadata-path file
+
+      File path to the yaml file containing the metadata to upload a record to an Invenio
+      repository, e.g.  path/to/files/record.yaml
+
+   .. option:: -f {json,yaml}, --metadata-format {json,yaml}
+
+      Parse metadata file as this type (default: yaml).
+
+   .. option:: --files FILES [FILES ...]
+
+      List of file paths associated with the record to be uploaded, e.g. path/to/files/data.*
+
+   .. option:: --community str
+
+      Name of a Invenio repository community to upload the record to, e.g. biosimdb,
+      data-to-knowledge, etc.
+
+
+``data_collections_api`` can take your data and metadata and automatically upload it to the Invenio
+repository. To do so, you need to have some information at hand:
+
+- The URL of the repository you wish to upload the data to. In the case of PSDI data, this will
+  often be https://data-collections.psdi.ac.uk.
+- Your API key (also called a Personal Access Token or PAT) for the repository to give permissions
+  to write and upload data.
+- A metadata file detailing the data relating to the files (see :doc:`schemas/index`).
+- The files ready to upload.
+
+With all this prepared, uploading the data is as simple as:
+
+.. code-block:: console
+
+   data_collections upload --api-url https://data-collections.psdi.ac.uk --api-key 1234567890abcdef --metadata-path /path/to/metata_file.yaml --files FILE1 FILE2 --community my_community
+
+.. note::
+
+   Since this is a common operation it is also available as the standalone :option:`upload_record`
+
+.. _validate:
 
 validate
 ********
 
-.. code-block:: text
+.. program:: data_collections validate
 
-   usage: data_collections validate [-h] [-f {json,yaml}] file
+.. describe:: data_collections validate
 
-   Validate a metadata file or string.
+   .. option:: FILE
 
-   positional arguments:
-     file                  File to validate
+      File to validate.
 
-   options:
-     -h, --help            show this help message and exit
-     -f, --format {json,yaml}
-                           Parse FILE as this type (default: determine from
-                           suffix).
+   .. option:: -f {json,yaml}, --format {json,yaml}
 
-Validate the metadata file for a dataset complies with the schema before uploading. See `schema`__ for details on a valid metadata file.
+      Parse :option:`FILE` as this type (default: determine from suffix).
+
+Validate the metadata file for a dataset before uploading.
+
+``data_collections_api`` can validate your metadata file against the schema to verify the contents
+of the file match what is required to make a valid upload.
+
+.. note::
+
+   The validator does not verify most data itself, you must ensure that all entries are spelled and
+   written correctly.
+
+To validate a data file simply run:
+
+.. code-block:: console
+
+   data_collections validate [file]
+
+e.g.
+
+.. code-block:: console
+
+   data_collections validate examples/biosim_record.yaml
+
+The file can be either in ``json`` or ``yaml`` formats (see: :doc:`schema`). :option:`data_collections validate` will attempt to determine the
+appropriate format from the file extension, but this can be specified explicitly with the ``-f``
+flag.
+
+.. code-block:: console
+
+   data_collections validate -f json examples/biosim_record.yaml
+
+.. note::
+
+   The above will raise an error since the file is not in ``json`` format.
 
 dump
 ****
 
-.. code-block:: text
+.. program:: data_collections template
+.. describe:: data_collections template
+.. describe:: data_collections dump
 
-   usage: data_collections template [-h] [-f {json,yaml}] file
+   .. option:: FILE
 
-   Dump a file template to file.
+      File to dump.
 
-   positional arguments:
-     file                  File to write
+   .. option:: -f {json,yaml}, --format {json,yaml}
 
-   options:
-     -h, --help            show this help message and exit
-     -f, --format {json,yaml}
-                           Parse FILE as this type (default: determine from
-                           suffix).
+      Dump :option:`FILE` as this type (default: determine from suffix).
 
+``data_collections_api`` provides a method to quick-start building metadata, ``template`` will dump
+an example metadata file for a particular community and data-type (though currently only a basic
+example is available).  To do so, simply run
 
-Dump a template metadata file ready for modification to upload.
+.. code-block:: console
+
+   data_collections dump my_metadata.yaml
+
+You can then edit and modify this template to fill in the data needed.
 
 
 upload_record
 -------------
 
-.. code-block:: text
+.. program:: upload_record
+.. describe:: upload_record
 
-   usage: upload_record [-h] --api-url URL --api-key str --metadata-path file
-                        [-f {json,yaml}] [--files FILES [FILES ...]] [--community str]
+   .. option:: --api-url URL
 
-   Upload records to Invenio repository
+      URL for the API associated with the Invenio repository, e.g.
+      https://data-collections-staging.psdi.ac.uk/api
 
-   options:
-     -h, --help            show this help message and exit
-     --api-url URL         URL for the API associated with the Invenio repository, e.g.
-                           https://data-collections-staging.psdi.ac.uk/api
-     --api-key str         Your API key/token for accessing the Invenio repository
-                           instance.
-     --metadata-path file  File path to the yaml file containing the metadata to upload
-                           a record to an Invenio repository, e.g.
-                           path/to/files/record.yaml
-     -f {json,yaml}, --metadata-format {json,yaml}
-                           Parse metadata file as this type (default: yaml).
-     --files FILES [FILES ...]
-                           List of file paths associated with the record to be
-                           uploaded, e.g. path/to/files/data.*
-     --community str       Name of a Invenio repository community to upload the record
-                           to, e.g. biosimdb, data-to-knowledge, etc.
+   .. option:: --api-key str
+
+      Your API key/token for accessing the Invenio repository instance.
+
+   .. option:: --metadata-path file
+
+      File path to the yaml file containing the metadata to upload a record to an Invenio
+      repository, e.g.  path/to/files/record.yaml
+
+   .. option:: -f {json,yaml}, --metadata-format {json,yaml}
+
+      Parse metadata file as this type (default: yaml).
+
+   .. option:: --files FILES [FILES ...]
+
+      List of file paths associated with the record to be uploaded, e.g. ``path/to/files/data.*``
+
+   .. option:: --community str
+
+      Name of a Invenio repository community to upload the record to, e.g. biosimdb,
+      data-to-knowledge, etc.
 
 
-One-stop tool to upload a record to the repository. This requries that you have already defined your metadata file (see ``dump`` and ``validate``) and got an API key (see: PSDI Invenio docs on how to get this)
+One-stop tool to upload a record to the repository, see `upload`_.
+
+.. _pat_guide: ...

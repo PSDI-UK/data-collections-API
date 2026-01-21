@@ -69,7 +69,7 @@ def get_arg_parser() -> argparse.ArgumentParser:
         "-f",
         "--format",
         choices=("json", "yaml"),
-        help="Parse FILE as this type (default: determine from suffix).",
+        help="Dump FILE as this type (default: determine from suffix).",
         default=None,
     )
     sp.set_defaults(func=dump_example)

@@ -29,9 +29,7 @@ This page documents the available schemas.
    :maxdepth: 1
    :caption: Schemas:
 
-{schemas}
-
-"""
+{schemas}"""
 
 
 def get_arg_parser() -> argparse.ArgumentParser:

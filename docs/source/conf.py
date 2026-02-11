@@ -38,13 +38,16 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinxcontrib.contentui",
-    "myst_parser",
+    "myst_nb",
 ]
+
+nb_execution_mode = "off"
 
 source_suffix = {
     ".rst": "restructuredtext",
-    ".txt": "markdown",
-    ".md": "markdown",
+    ".txt": "myst-nb",
+    ".md": "myst-nb",
+    ".ipynb": "myst-nb",
 }
 
 apidoc_modules = [

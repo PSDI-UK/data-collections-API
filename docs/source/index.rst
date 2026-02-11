@@ -15,5 +15,6 @@ Project to allow simplified editing and construction of Invenio data for the PSD
 
    cli
    schema
+   deposition_tutorial/index
    schemas/index
    API Documentation <api/modules>

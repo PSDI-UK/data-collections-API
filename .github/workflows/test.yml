@@ -1,0 +1,72 @@
+name: Build and Install
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: |
+           3.10.19
+           3.9
+
+    - name: Set up Docker Compose
+      uses: docker/setup-compose-action@v1
+
+    # Building mandb triggers take 45s+ for no benefit (we don't use man in CI)
+    - name: Disable mandb
+      run: |
+        echo "set man-db/auto-update false" | sudo debconf-communicate
+        sudo dpkg-reconfigure man-db
+
+    - name: Setup Invenio deps
+      run: |
+        sudo apt-get update
+        sudo apt-get install libcairo2-dev fonts-dejavu imagemagick
+        pip install --upgrade pip pipfile
+        pip install invenio-cli click invenio invenio-oauth2server invenio-accounts
+
+    - name: Setup Invenio
+      run: |
+        invenio-cli check-requirements
+        yes "" | invenio-cli init rdm # (choose defaults as test)
+
+    - name: start invenio
+      run: |
+        invenio-cli install all
+        invenio-cli services setup
+        invenio-cli services start
+        invenio-cli run all &
+        echo "Starting:"
+        invenio users create --password 123 test@test.com
+        invenio tokens create -n test-token -u test@test.com
+        exit 1
+      working-directory: my-site
+
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: |
+        /opt/hostedtoolcache/Python/3.10.19/x64/python -m pip install setuptools build
+
+    - name: Install
+      run: |
+        /opt/hostedtoolcache/Python/3.10.19/x64/python -m pip install ".[test]"
+
+    - name: Run Tests
+      run: |
+        /opt/hostedtoolcache/Python/3.10.19/x64/python -m pytest --doctest-modules
